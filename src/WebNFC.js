@@ -53,4 +53,32 @@
  * }} UnknownNDEFRecord
  *
  * @typedef {EmptyNDEFRecord | TextNDEFRecord | UrlNDEFRecord | SmartPosterNDEFRecord | MimeNDEFRecord | UnknownNDEFRecord} NDEFRecord
+ *
+ * @typedef {{
+ *  records: readonly NDEFRecord[];
+ * }} NDEFMessage
+ *
+ * @typedef {{
+ *   records: NDEFRecordInit[];
+ * }} NDEFMessageInit
+ *
+ * @typedef {unknown} NDEFRecordInit // TODO
  */
+
+/**
+ * @param {NDEFMessageInit} message
+ * @returns {NDEFMessage}
+ */
+export function createNdefMessage(message) {
+	return {
+		records: message.records.map(createNdefRecord),
+	};
+}
+
+/**
+ * @param {NDEFRecordInit} record
+ * @returns {NDEFRecord}
+ */
+export function createNdefRecord(record) {
+	throw new Error("Not implemented");
+}
