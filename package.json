@@ -25,7 +25,9 @@
     "url": "https://github.com/don/ndef-js/issues"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4"
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.10.6",
+    "typescript": "^5.7.3"
   },
   "engines": {
     "node": ">=22.13.0"
