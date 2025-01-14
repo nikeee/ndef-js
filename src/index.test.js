@@ -197,14 +197,14 @@ describe("decodeMessage", () => {
 		assert.equal(3, decodedMessage.length);
 
 		assert.equal(ndef.TNF.WELL_KNOWN, decodedMessage[0].tnf);
-		assert.equal(ndef.RTD_TEXT, decodedMessage[0].type);
+		assert.equal(ndef.RTD.TEXT, decodedMessage[0].type);
 		assert.equal(
 			"hello, world",
 			new Buffer(decodedMessage[0].payload).slice(3),
 		);
 
 		assert.equal(ndef.TNF.WELL_KNOWN, decodedMessage[1].tnf);
-		assert.equal(ndef.RTD_URI, decodedMessage[1].type);
+		assert.equal(ndef.RTD.URI, decodedMessage[1].type);
 		assert.equal("nodejs.org", new Buffer(decodedMessage[1].payload).slice(1)); // char 0 is 0x3 for http://
 
 		assert.equal(ndef.TNF.MIME_MEDIA, decodedMessage[2].tnf);
@@ -271,7 +271,7 @@ describe("stringify", () => {
 	it("only handles some well known types", () => {
 		const record = ndef.record(
 			ndef.TNF.WELL_KNOWN,
-			ndef.RTD_HANDOVER_REQUEST,
+			ndef.RTD.HANDOVER_REQUEST,
 			[0x48, 0x72],
 			[
 				0x12, 0x91, 0x02, 0x02, 0x63, 0x72, 0xaa, 0x0d, 0x51, 0x02, 0x04, 0x61,

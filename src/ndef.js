@@ -23,16 +23,19 @@ const TNF = /* @__PURE__ */ {
 	RESERVED: 0x07,
 };
 
+const RTD = /* @__PURE__ */ {
+	TEXT: "T", // [0x54]
+	URI: "U", // [0x55]
+	SMART_POSTER: "Sp", // [0x53, 0x70]
+	ALTERNATIVE_CARRIER: "ac", //[0x61, 0x63]
+	HANDOVER_CARRIER: "Hc", // [0x48, 0x63]
+	HANDOVER_REQUEST: "Hr", // [0x48, 0x72]
+	HANDOVER_SELECT: "Hs", // [0x48, 0x73]
+};
+
 const ndef = {
 	TNF,
-
-	RTD_TEXT: "T", // [0x54]
-	RTD_URI: "U", // [0x55]
-	RTD_SMART_POSTER: "Sp", // [0x53, 0x70]
-	RTD_ALTERNATIVE_CARRIER: "ac", //[0x61, 0x63]
-	RTD_HANDOVER_CARRIER: "Hc", // [0x48, 0x63]
-	RTD_HANDOVER_REQUEST: "Hr", // [0x48, 0x72]
-	RTD_HANDOVER_SELECT: "Hs", // [0x48, 0x73]
+	RTD,
 
 	/**
 	 * Creates a JSON representation of a NDEF Record.
@@ -73,10 +76,10 @@ const ndef = {
 		// Convert payload to text for Text and URI records
 		if (tnf === ndef.TNF.WELL_KNOWN) {
 			switch (record.type) {
-				case ndef.RTD_TEXT:
+				case ndef.RTD.TEXT:
 					record.value = ndef.text.decodePayload(record.payload);
 					break;
-				case ndef.RTD_URI:
+				case ndef.RTD.URI:
 					record.value = ndef.uri.decodePayload(record.payload);
 					break;
 			}
@@ -94,7 +97,7 @@ const ndef = {
 	 */
 	textRecord: (text, languageCode, id = []) => {
 		const payload = textHelper.encodePayload(text, languageCode);
-		return ndef.record(ndef.TNF.WELL_KNOWN, ndef.RTD_TEXT, id, payload);
+		return ndef.record(ndef.TNF.WELL_KNOWN, ndef.RTD.TEXT, id, payload);
 	},
 
 	/**
@@ -105,7 +108,7 @@ const ndef = {
 	 */
 	uriRecord: (uri, id = []) => {
 		const payload = uriHelper.encodePayload(uri);
-		return ndef.record(ndef.TNF.WELL_KNOWN, ndef.RTD_URI, id, payload);
+		return ndef.record(ndef.TNF.WELL_KNOWN, ndef.RTD.URI, id, payload);
 	},
 
 	/**
@@ -170,7 +173,7 @@ const ndef = {
 			console.log("WARNING: Expecting an array of NDEF records");
 		}
 
-		return ndef.record(ndef.TNF.WELL_KNOWN, ndef.RTD_SMART_POSTER, id, payload);
+		return ndef.record(ndef.TNF.WELL_KNOWN, ndef.RTD.SMART_POSTER, id, payload);
 	},
 
 	/**
@@ -510,17 +513,17 @@ const stringifier = {
 		}
 
 		switch (record.type) {
-			case ndef.RTD_TEXT:
+			case ndef.RTD.TEXT:
 				result += "Text Record";
 				result += separator;
 				result += ndef.text.decodePayload(record.payload);
 				break;
-			case ndef.RTD_URI:
+			case ndef.RTD.URI:
 				result += "URI Record";
 				result += separator;
 				result += ndef.uri.decodePayload(record.payload);
 				break;
-			case ndef.RTD_SMART_POSTER:
+			case ndef.RTD.SMART_POSTER:
 				result += "Smart Poster";
 				result += separator;
 				// the payload of a smartposter is a NDEF message

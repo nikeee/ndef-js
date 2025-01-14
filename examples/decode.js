@@ -25,12 +25,12 @@ message.forEach(function(record) {
 
     var payload, languageCodeLength, utf16, prefix;
 
-    // TODO record.isType(ndef.TNF.WELL_KNOWN, ndef.RTD_TEXT)
-    if (record.tnf === ndef.TNF.WELL_KNOWN && record.type[0] === ndef.RTD_TEXT[0]) {
+    // TODO record.isType(ndef.TNF.WELL_KNOWN, ndef.RTD.TEXT)
+    if (record.tnf === ndef.TNF.WELL_KNOWN && record.type[0] === ndef.RTD.TEXT[0]) {
 
         console.log(ndef.text.decodePayload(record.payload));
 
-    } else if (record.tnf === ndef.TNF.WELL_KNOWN && record.type[0] === ndef.RTD_URI[0]) {
+    } else if (record.tnf === ndef.TNF.WELL_KNOWN && record.type[0] === ndef.RTD.URI[0]) {
 
         console.log(ndef.uri.decodePayload(record.payload));
 
