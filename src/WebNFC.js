@@ -22,7 +22,7 @@
  *   lang: string;
  *   encoding: "utf-8";
  *   mediaType: null;
- *   data: null | DataView;
+ *   data: DataView;
  * }} TextNDEFRecord
  *
  * @typedef {{
@@ -449,33 +449,38 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 			? record.id
 			: undefined;
 
-	const header = {
-		mb: recordIndex === 0,
-		me: recordIndex === recordCount - 1,
-		cf: false,
-		sr: false,
-		il: id !== undefined,
-		tnf: 0,
-	};
-
+	let tnf = 0;
 	/** @type {Uint8Array} */
 	let type = emptyBuffer;
+	let payload = emptyBuffer;
 
 	switch (record.recordType) {
 		case "empty":
-			header.tnf = TNF.EMPTY;
+			tnf = TNF.EMPTY;
 			type = emptyBuffer;
 			break;
-		case "text":
-			header.tnf = TNF.WELL_KNOWN;
+		case "text": {
+			tnf = TNF.WELL_KNOWN;
 			type = new Uint8Array([0x54]); // "T"
+
+			const payloadHeader =
+				(record.encoding !== "utf-8" ? 0b1_0_000000 : 0) |
+				(record.lang.length & 0b0_0_111111);
+
+			payload = new Uint8Array([
+				payloadHeader,
+				...textEncoder.encode(record.lang),
+				...new Uint8Array(record.data.buffer),
+			]);
+
 			break;
+		}
 		case "url":
-			header.tnf = TNF.WELL_KNOWN;
+			tnf = TNF.WELL_KNOWN;
 			type = new Uint8Array([0x55]); // "U"
 			break;
 		case "mime":
-			header.tnf = TNF.MIME_MEDIA;
+			tnf = TNF.MIME_MEDIA;
 			type = new Uint8Array(0); // TODO: Serialize mime type: https://mimesniff.spec.whatwg.org/#serialize-a-mime-type
 			break;
 		case "smart-poster":
@@ -489,18 +494,6 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 			throw new Error("Unsupported recordType");
 	}
 
-	const payload = emptyBuffer; // TODO
-	// TEXT:
-	/*
-		const header = (encoding !== "utf-8" ? 0b1_0_000000 : 0) |
-		(lang.length & 0b0_0_111111);
-		const payload = [
-			header,
-			...textEncoder.encode(lang),
-			...(typeof data === "string" ? textEncoder.encode(data) : data),
-		];
-	*/
-
 	// URL:
 	/*
 		const [prefixNumber, prefix] = findLongestPrefix(
@@ -512,7 +505,14 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 			prefix.length > 0 ? serializedUrl.slice(prefix.length) : prefix;
 	*/
 
-	header.sr = payload.length <= 255;
+	const header = {
+		mb: recordIndex === 0,
+		me: recordIndex === recordCount - 1,
+		cf: false,
+		sr: payload.length <= 255,
+		il: id !== undefined,
+		tnf,
+	};
 
 	// @ts-ignore
 	const headerByte =
