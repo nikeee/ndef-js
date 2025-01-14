@@ -410,15 +410,27 @@ const TNF = /* @__PURE__ */ Object.freeze({
 
 /**
  * @param {NDEFMessage} message
- * @returns {Uint8Array}
+ * @returns {ArrayBuffer}
  */
 export function encodeNdefMessage(message) {
 	const recordCount = message.records.length;
-	const _encodedRecords = message.records.map((r, i) =>
+	const encodedRecords = message.records.map((r, i) =>
 		encodeNdefRecord(r, i, recordCount),
 	);
 
-	throw new Error("Not implemented");
+	let totalLength = 0;
+	for (const record of encodedRecords) {
+		totalLength += record.byteLength;
+	}
+
+	const resultBuffer = new Uint8Array(totalLength);
+	let offset = 0;
+	for (const record of encodedRecords) {
+		resultBuffer.set(new Uint8Array(record), offset);
+		offset += record.byteLength;
+	}
+
+	return resultBuffer.buffer;
 }
 
 const emptyBuffer = new Uint8Array(0);
@@ -533,9 +545,7 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 		recordData.push(...payload);
 	}
 
-	const recordBuffer = new Uint8Array(recordData).buffer;
-
-	throw new Error("Not implemented");
+	return new Uint8Array(recordData).buffer;
 }
 
 /**
