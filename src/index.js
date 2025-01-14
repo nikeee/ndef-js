@@ -1,4 +1,4 @@
-var ndef = require('./lib/ndef');
+var ndef = require('./ndef');
 module.exports = ndef;
 
 if (process.version.indexOf('v0.8') === 0) {
@@ -7,7 +7,7 @@ if (process.version.indexOf('v0.8') === 0) {
         j = [];
         for (var i = 0; i < this.length; i++) {
             j[i] = this[i];
-        }    
+        }
         return j;
     }
 }

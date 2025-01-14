@@ -2,10 +2,7 @@
   "name": "ndef",
   "version": "0.2.0",
   "description": "Library to create and parse NDEF messages.",
-  "main": "index.js",
-  "directories": {
-    "test": "test"
-  },
+  "main": "src/index.js",
   "scripts": {
     "test": "mocha test/*.js",
     "ci": "biome ci ./src",

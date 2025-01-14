@@ -1,5 +1,5 @@
 var assert = require("assert"),
-    util = require("../lib/ndef-util");
+    util = require("./ndef-util");
 
 describe('UTF-8', function() {
 
