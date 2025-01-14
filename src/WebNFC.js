@@ -8,8 +8,8 @@
 
 /**
  * @typedef {{
- *  id: string | null;
- *  lang: null | string;
+ *   id: string | null;
+ *   lang: null | string;
  * }} NDEFRecordBase
  *
  * @typedef {{
@@ -22,40 +22,40 @@
  * }} EmptyNDEFRecord
  *
  * @typedef {{
- *  recordType: "text";
- *  mediaType: null;
- *  data: null | DataView;
- *  lang: string;
+ *   recordType: "text";
+ *   mediaType: null;
+ *   data: null | DataView;
+ *   lang: string;
  * }} TextNDEFRecord
  *
  * @typedef {{
- *  recordType: "url";
- *  mediaType: null;
- *  data: null | DataView;
- *  lang: null;
- *  encoding: null;
+ *   recordType: "url";
+ *   mediaType: null;
+ *   data: null | DataView;
+ *   lang: null;
+ *   encoding: null;
  * }} UrlNDEFRecord
  *
  * @typedef {{
- *  recordType: "smart-poster";
- *  mediaType: null;
- *  data: null | DataView;
+ *   recordType: "smart-poster";
+ *   mediaType: null;
+ *   data: null | DataView;
  * }} SmartPosterNDEFRecord
  *
  * @typedef {{
- *  recordType: "mime";
- *  mediaType: string;
+ *   recordType: "mime";
+ *   mediaType: string;
  * }} MimeNDEFRecord
  *
  * @typedef {{
- *  recordType: "unknown";
- *  mediaType: null;
+ *   recordType: "unknown";
+ *   mediaType: null;
  * }} UnknownNDEFRecord
  *
  * @typedef {EmptyNDEFRecord | TextNDEFRecord | UrlNDEFRecord | SmartPosterNDEFRecord | MimeNDEFRecord | UnknownNDEFRecord} NDEFRecord
  *
  * @typedef {{
- *  records: readonly NDEFRecord[];
+ *   records: readonly NDEFRecord[];
  * }} NDEFMessage
  *
  * @typedef {{
