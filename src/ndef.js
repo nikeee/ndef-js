@@ -83,9 +83,9 @@ const ndef = {
 	/**
 	 * Helper that creates an NDEF record containing plain text.
 	 *
-	 * @text String of text to encode
-	 * @languageCode ISO/IANA language code. Examples: “fi”, “en-US”, “fr-CA”, “jp”. (optional)
-	 * @id byte[] (optional)
+	 * @param {string} text String of text to encode
+	 * @param {string} languageCode ISO/IANA language code. Examples: “fi”, “en-US”, “fr-CA”, “jp”. (optional)
+	 * @param {number[] | undefined | null} id
 	 */
 	textRecord: (text, languageCode, id = []) => {
 		const payload = textHelper.encodePayload(text, languageCode);
@@ -95,8 +95,8 @@ const ndef = {
 	/**
 	 * Helper that creates a NDEF record containing a URI.
 	 *
-	 * @uri String
-	 * @id byte[] (optional)
+	 * @param {string} uri
+	 * @param {number[] | undefined | null} id
 	 */
 	uriRecord: (uri, id = []) => {
 		const payload = uriHelper.encodePayload(uri);
@@ -122,9 +122,9 @@ const ndef = {
 	 *
 	 * To write a URI as the payload use ndef.uriRecord(uri)
 	 *
-	 * @uri String
-	 * @payload byte[] or String
-	 * @id byte[] (optional)
+	 * @param {string} uri
+	 * @param {number[]} payload
+	 * @param {number[] | undefined | null} id
 	 */
 	absoluteUriRecord: (uri, payload = [], id = []) => {
 		return ndef.record(ndef.TNF_ABSOLUTE_URI, uri, id, payload);
@@ -133,9 +133,9 @@ const ndef = {
 	/**
 	 * Helper that creates a NDEF record containing an mimeMediaRecord.
 	 *
-	 * @mimeType String
-	 * @payload byte[]
-	 * @id byte[] (optional)
+	 * @param {string} mimeType
+	 * @param {number[]} payload
+	 * @param {number[] | undefined | undefined} id
 	 */
 	mimeMediaRecord: (mimeType, payload, id = []) => {
 		return ndef.record(ndef.TNF_MIME_MEDIA, mimeType, id, payload);
@@ -144,8 +144,8 @@ const ndef = {
 	/**
 	 * Helper that creates an NDEF record containing an Smart Poster.
 	 *
-	 * @ndefRecords array of NDEF Records
-	 * @id byte[] (optional)
+	 * @param {object[]} ndefRecords array of NDEF Records
+	 * @param {number[] | undefined | undefined} id
 	 */
 	smartPoster: (ndefRecords, id = []) => {
 		let payload = [];
@@ -178,6 +178,7 @@ const ndef = {
 	 * Helper that creates an Android Application Record (AAR).
 	 * http://developer.android.com/guide/topics/connectivity/nfc/nfc.html#aar
 	 *
+	 * @param {string} packageName of the application
 	 */
 	androidApplicationRecord: (packageName) =>
 		ndef.record(ndef.TNF_EXTERNAL_TYPE, "android.com:pkg", [], packageName),
@@ -185,9 +186,9 @@ const ndef = {
 	/**
 	 * Encodes an NDEF Message into bytes that can be written to a NFC tag.
 	 *
-	 * @ndefRecords an Array of NDEF Records
+	 * @param {object[]} ndefRecords an Array of NDEF Records
 	 *
-	 * @returns byte array
+	 * @returns {number[]} byte array
 	 *
 	 * @see NFC Data Exchange Format (NDEF) http://www.nfc-forum.org/specs/spec_list/
 	 */
@@ -248,7 +249,7 @@ const ndef = {
 	/**
 	 * Decodes an array bytes into an NDEF Message
 	 *
-	 * @ndefBytes an array bytes or Buffer that was read from a NFC tag
+	 * @param {number[]} ndefBytes an array bytes or Buffer that was read from a NFC tag
 	 *
 	 * @returns array of NDEF Records
 	 *
@@ -315,9 +316,9 @@ const ndef = {
 	/**
 	 * Decode the bit flags from a TNF Byte.
 	 *
+	 * @param {number} tnf_byte
 	 * @returns object with decoded data
-	 *
-	 *  See NFC Data Exchange Format (NDEF) Specification Section 3.2 RecordLayout
+	 * @remarks See NFC Data Exchange Format (NDEF) Specification Section 3.2 RecordLayout
 	 */
 	decodeTnf: (tnf_byte) => ({
 		mb: (tnf_byte & 0x80) !== 0,
@@ -331,32 +332,38 @@ const ndef = {
 	/**
 	 * Encode NDEF bit flags into a TNF Byte.
 	 *
-	 * @returns tnf byte
+	 * @param {boolean} mb messageBegin
+	 * @param {boolean} me messageEnd
+	 * @param {boolean} cf chunkFlag
+	 * @param {boolean} sr shortRecord
+	 * @param {boolean} il idLengthFieldIsPresent
+	 * @param {number} tnf type name format
+	 * @returns {number} tnf byte
 	 *
-	 *  See NFC Data Exchange Format (NDEF) Specification Section 3.2 RecordLayout
+	 * @remarks See NFC Data Exchange Format (NDEF) Specification Section 3.2 RecordLayout
 	 */
 	encodeTnf: (mb, me, cf, sr, il, tnf) => {
 		let value = tnf;
 
 		if (mb) {
-			value = value | 0x80;
+			value |= 0x80;
 		}
 
 		if (me) {
-			value = value | 0x40;
+			value |= 0x40;
 		}
 
 		// note if cf: me, mb, li must be false and tnf must be 0x6
 		if (cf) {
-			value = value | 0x20;
+			value |= 0x20;
 		}
 
 		if (sr) {
-			value = value | 0x10;
+			value |= 0x10;
 		}
 
 		if (il) {
-			value = value | 0x8;
+			value |= 0x8;
 		}
 
 		return value;
