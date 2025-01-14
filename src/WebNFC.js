@@ -341,17 +341,18 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 	let type = null;
 
 	switch (record.recordType) {
-		case "empty": {
+		case "empty":
 			header.tnf = TNF.EMPTY;
 			type = new Uint8Array(0);
 			break;
-		}
-		case "text": {
+		case "text":
 			header.tnf = TNF.WELL_KNOWN;
 			type = new Uint8Array([0x54]); // "T"
 			break;
-		}
-
+		case "mime":
+			header.tnf = TNF.MIME_MEDIA;
+			type = new Uint8Array(0); // TODO: Serialize mime type: https://mimesniff.spec.whatwg.org/#serialize-a-mime-type
+			break;
 		default:
 			throw new Error("Unsupported recordType");
 	}
