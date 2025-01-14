@@ -5,9 +5,9 @@
 //
 // This code is from phonegap-nfc.js https://github.com/don/phonegap-nfc
 
-import * as util from "./ndef-util.js";
 import * as textHelper from "./ndef-text.js";
 import * as uriHelper from "./ndef-uri.js";
+import * as util from "./ndef-util.js";
 
 const ndef = {
 	// see android.nfc.NdefRecord for documentation about constants
