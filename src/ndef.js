@@ -41,21 +41,7 @@ const ndef = {
 	 *
 	 * @see Ndef.textRecord, Ndef.uriRecord and Ndef.mimeMediaRecord for examples
 	 */
-	record: (tnf, type, id, payload) => {
-		// handle null values
-		if (!tnf) {
-			tnf = ndef.TNF_EMPTY;
-		}
-		if (!type) {
-			type = [];
-		}
-		if (!id) {
-			id = [];
-		}
-		if (!payload) {
-			payload = [];
-		}
-
+	record: (tnf = ndef.TNF_EMPTY, type = [], id = [], payload = []) => {
 		// store type as String so it's easier to compare
 		if (Array.isArray(type)) {
 			type = util.bytesToString(type);
@@ -101,12 +87,8 @@ const ndef = {
 	 * @languageCode ISO/IANA language code. Examples: “fi”, “en-US”, “fr-CA”, “jp”. (optional)
 	 * @id byte[] (optional)
 	 */
-	textRecord: (text, languageCode, id) => {
+	textRecord: (text, languageCode, id = []) => {
 		const payload = textHelper.encodePayload(text, languageCode);
-		if (!id) {
-			id = [];
-		}
-
 		return ndef.record(ndef.TNF_WELL_KNOWN, ndef.RTD_TEXT, id, payload);
 	},
 
@@ -116,11 +98,8 @@ const ndef = {
 	 * @uri String
 	 * @id byte[] (optional)
 	 */
-	uriRecord: (uri, id) => {
+	uriRecord: (uri, id = []) => {
 		const payload = uriHelper.encodePayload(uri);
-		if (!id) {
-			id = [];
-		}
 		return ndef.record(ndef.TNF_WELL_KNOWN, ndef.RTD_URI, id, payload);
 	},
 
@@ -147,13 +126,7 @@ const ndef = {
 	 * @payload byte[] or String
 	 * @id byte[] (optional)
 	 */
-	absoluteUriRecord: (uri, payload, id) => {
-		if (!id) {
-			id = [];
-		}
-		if (!payload) {
-			payload = [];
-		}
+	absoluteUriRecord: (uri, payload = [], id = []) => {
 		return ndef.record(ndef.TNF_ABSOLUTE_URI, uri, id, payload);
 	},
 
@@ -164,10 +137,7 @@ const ndef = {
 	 * @payload byte[]
 	 * @id byte[] (optional)
 	 */
-	mimeMediaRecord: (mimeType, payload, id) => {
-		if (!id) {
-			id = [];
-		}
+	mimeMediaRecord: (mimeType, payload, id = []) => {
 		return ndef.record(ndef.TNF_MIME_MEDIA, mimeType, id, payload);
 	},
 
@@ -177,12 +147,8 @@ const ndef = {
 	 * @ndefRecords array of NDEF Records
 	 * @id byte[] (optional)
 	 */
-	smartPoster: (ndefRecords, id) => {
+	smartPoster: (ndefRecords, id = []) => {
 		let payload = [];
-
-		if (!id) {
-			id = [];
-		}
 
 		if (ndefRecords) {
 			// make sure we have an array of something like NDEF records before encoding
@@ -457,17 +423,13 @@ const stringifier = {
 	// @message - NDEF Message (array of NDEF Records)
 	// @separator - line separator, optional, defaults to \n
 	// @returns string with NDEF Message
-	printRecords: (message, separator) => {
-		if (!separator) {
-			separator = "\n";
-		}
+	printRecords: (message, separator = "\n") => {
 		let result = "";
-
 		// Print out the payload for each record
-		message.forEach((record) => {
+		for (const record of message) {
 			result += stringifier.printRecord(record, separator);
 			result += separator;
-		});
+		}
 
 		return result.slice(0, -1 * separator.length);
 	},
@@ -475,12 +437,8 @@ const stringifier = {
 	// @record - NDEF Record
 	// @separator - line separator, optional, defaults to \n
 	// @returns string with NDEF Record
-	printRecord: (record, separator) => {
+	printRecord: (record, separator = "\n") => {
 		let result = "";
-
-		if (!separator) {
-			separator = "\n";
-		}
 
 		switch (record.tnf) {
 			case ndef.TNF_EMPTY:
@@ -556,7 +514,10 @@ const stringifier = {
 	},
 };
 
-// convert bytes to a String
+/**
+ * @param {number[]} bytes
+ * @returns {string}
+ */
 function s(bytes) {
 	return Buffer.from(bytes).toString();
 }
