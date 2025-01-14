@@ -1,1 +1,6 @@
+node_modules
 examples
+.github
+.vscode
+tsconfig.json
+*.test.js
