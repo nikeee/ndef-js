@@ -196,18 +196,18 @@ describe("decodeMessage", () => {
 		const decodedMessage = ndef.decodeMessage(multipleRecordMessage);
 		assert.equal(3, decodedMessage.length);
 
-		assert.equal(ndef.TNF_WELL_KNOWN, decodedMessage[0].tnf);
+		assert.equal(ndef.TNF.WELL_KNOWN, decodedMessage[0].tnf);
 		assert.equal(ndef.RTD_TEXT, decodedMessage[0].type);
 		assert.equal(
 			"hello, world",
 			new Buffer(decodedMessage[0].payload).slice(3),
 		);
 
-		assert.equal(ndef.TNF_WELL_KNOWN, decodedMessage[1].tnf);
+		assert.equal(ndef.TNF.WELL_KNOWN, decodedMessage[1].tnf);
 		assert.equal(ndef.RTD_URI, decodedMessage[1].type);
 		assert.equal("nodejs.org", new Buffer(decodedMessage[1].payload).slice(1)); // char 0 is 0x3 for http://
 
-		assert.equal(ndef.TNF_MIME_MEDIA, decodedMessage[2].tnf);
+		assert.equal(ndef.TNF.MIME_MEDIA, decodedMessage[2].tnf);
 		assert.equal("text/json", new Buffer(decodedMessage[2].type));
 		assert.equal(
 			'{"message": "hello, world"}',
@@ -270,7 +270,7 @@ describe("stringify", () => {
 
 	it("only handles some well known types", () => {
 		const record = ndef.record(
-			ndef.TNF_WELL_KNOWN,
+			ndef.TNF.WELL_KNOWN,
 			ndef.RTD_HANDOVER_REQUEST,
 			[0x48, 0x72],
 			[
@@ -301,14 +301,14 @@ describe("stringify", () => {
 
 describe("TNF to String", () => {
 	it("should stringify known TNF", () => {
-		assert.equal(ndef.tnfToString(ndef.TNF_EMPTY), "Empty");
-		assert.equal(ndef.tnfToString(ndef.TNF_WELL_KNOWN), "Well Known");
-		assert.equal(ndef.tnfToString(ndef.TNF_MIME_MEDIA), "Mime Media");
-		assert.equal(ndef.tnfToString(ndef.TNF_ABSOLUTE_URI), "Absolute URI");
-		assert.equal(ndef.tnfToString(ndef.TNF_EXTERNAL_TYPE), "External");
-		assert.equal(ndef.tnfToString(ndef.TNF_UNKNOWN), "Unknown");
-		assert.equal(ndef.tnfToString(ndef.TNF_UNCHANGED), "Unchanged");
-		assert.equal(ndef.tnfToString(ndef.TNF_RESERVED), "Reserved");
+		assert.equal(ndef.tnfToString(ndef.TNF.EMPTY), "Empty");
+		assert.equal(ndef.tnfToString(ndef.TNF.WELL_KNOWN), "Well Known");
+		assert.equal(ndef.tnfToString(ndef.TNF.MIME_MEDIA), "Mime Media");
+		assert.equal(ndef.tnfToString(ndef.TNF.ABSOLUTE_URI), "Absolute URI");
+		assert.equal(ndef.tnfToString(ndef.TNF.EXTERNAL_TYPE), "External");
+		assert.equal(ndef.tnfToString(ndef.TNF.UNKNOWN), "Unknown");
+		assert.equal(ndef.tnfToString(ndef.TNF.UNCHANGED), "Unchanged");
+		assert.equal(ndef.tnfToString(ndef.TNF.RESERVED), "Reserved");
 
 		assert.equal(ndef.tnfToString(0), "Empty");
 		assert.equal(ndef.tnfToString(1), "Well Known");
@@ -330,7 +330,7 @@ describe("TNF to String", () => {
 describe("Record Type", () => {
 	it("can be a String", () => {
 		const message = [
-			ndef.record(ndef.TNF_EXTERNAL_TYPE, "com.example:foo", [], "bar"),
+			ndef.record(ndef.TNF.EXTERNAL_TYPE, "com.example:foo", [], "bar"),
 		];
 
 		const encoded = ndef.encodeMessage(message);
@@ -340,7 +340,7 @@ describe("Record Type", () => {
 
 	it("can be an Array", () => {
 		const message = [
-			ndef.record(ndef.TNF_EXTERNAL_TYPE, "com.example:foo", [], "bar"),
+			ndef.record(ndef.TNF.EXTERNAL_TYPE, "com.example:foo", [], "bar"),
 		];
 
 		const encoded = ndef.encodeMessage(message);
@@ -350,7 +350,7 @@ describe("Record Type", () => {
 
 	it("should allow UTF-8", () => {
 		const message = [
-			ndef.record(ndef.TNF_ABSOLUTE_URI, "✓", [], "type is utf-8"),
+			ndef.record(ndef.TNF.ABSOLUTE_URI, "✓", [], "type is utf-8"),
 		];
 
 		const encoded = ndef.encodeMessage(message);

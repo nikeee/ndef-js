@@ -9,17 +9,22 @@ import * as textHelper from "./ndef-text.js";
 import * as uriHelper from "./ndef-uri.js";
 import * as util from "./ndef-util.js";
 
+/**
+ * See [android.nfc.NdefRecord](https://developer.android.com/reference/android/nfc/NdefRecord) for documentation about constants.
+ */
+const TNF = /* @__PURE__ */ {
+	EMPTY: 0x0,
+	WELL_KNOWN: 0x01,
+	MIME_MEDIA: 0x02,
+	ABSOLUTE_URI: 0x03,
+	EXTERNAL_TYPE: 0x04,
+	UNKNOWN: 0x05,
+	UNCHANGED: 0x06,
+	RESERVED: 0x07,
+};
+
 const ndef = {
-	// see android.nfc.NdefRecord for documentation about constants
-	// http://developer.android.com/reference/android/nfc/NdefRecord.html
-	TNF_EMPTY: 0x0,
-	TNF_WELL_KNOWN: 0x01,
-	TNF_MIME_MEDIA: 0x02,
-	TNF_ABSOLUTE_URI: 0x03,
-	TNF_EXTERNAL_TYPE: 0x04,
-	TNF_UNKNOWN: 0x05,
-	TNF_UNCHANGED: 0x06,
-	TNF_RESERVED: 0x07,
+	TNF,
 
 	RTD_TEXT: "T", // [0x54]
 	RTD_URI: "U", // [0x55]
@@ -32,7 +37,7 @@ const ndef = {
 	/**
 	 * Creates a JSON representation of a NDEF Record.
 	 *
-	 * @param {number} tnf 3-bit TNF (Type Name Format) - use one of the TNF_* constants
+	 * @param {number} tnf 3-bit TNF (Type Name Format) - use one of the TNF.* constants
 	 * @param {number[]} type byte array, containing zero to 255 bytes, must not be null
 	 * @param {number[]} id byte array, containing zero to 255 bytes, must not be null
 	 * @param {number[]} payload byte array, containing zero to (2 ** 32 - 1) bytes, must not be null
@@ -41,7 +46,7 @@ const ndef = {
 	 *
 	 * @see Ndef.textRecord, Ndef.uriRecord and Ndef.mimeMediaRecord for examples
 	 */
-	record: (tnf = ndef.TNF_EMPTY, type = [], id = [], payload = []) => {
+	record: (tnf = ndef.TNF.EMPTY, type = [], id = [], payload = []) => {
 		// store type as String so it's easier to compare
 		if (Array.isArray(type)) {
 			type = util.bytesToString(type);
@@ -66,7 +71,7 @@ const ndef = {
 
 		// Experimental feature
 		// Convert payload to text for Text and URI records
-		if (tnf === ndef.TNF_WELL_KNOWN) {
+		if (tnf === ndef.TNF.WELL_KNOWN) {
 			switch (record.type) {
 				case ndef.RTD_TEXT:
 					record.value = ndef.text.decodePayload(record.payload);
@@ -89,7 +94,7 @@ const ndef = {
 	 */
 	textRecord: (text, languageCode, id = []) => {
 		const payload = textHelper.encodePayload(text, languageCode);
-		return ndef.record(ndef.TNF_WELL_KNOWN, ndef.RTD_TEXT, id, payload);
+		return ndef.record(ndef.TNF.WELL_KNOWN, ndef.RTD_TEXT, id, payload);
 	},
 
 	/**
@@ -100,7 +105,7 @@ const ndef = {
 	 */
 	uriRecord: (uri, id = []) => {
 		const payload = uriHelper.encodePayload(uri);
-		return ndef.record(ndef.TNF_WELL_KNOWN, ndef.RTD_URI, id, payload);
+		return ndef.record(ndef.TNF.WELL_KNOWN, ndef.RTD_URI, id, payload);
 	},
 
 	/**
@@ -127,7 +132,7 @@ const ndef = {
 	 * @param {number[] | undefined | null} id
 	 */
 	absoluteUriRecord: (uri, payload = [], id = []) => {
-		return ndef.record(ndef.TNF_ABSOLUTE_URI, uri, id, payload);
+		return ndef.record(ndef.TNF.ABSOLUTE_URI, uri, id, payload);
 	},
 
 	/**
@@ -138,7 +143,7 @@ const ndef = {
 	 * @param {number[] | undefined | undefined} id
 	 */
 	mimeMediaRecord: (mimeType, payload, id = []) => {
-		return ndef.record(ndef.TNF_MIME_MEDIA, mimeType, id, payload);
+		return ndef.record(ndef.TNF.MIME_MEDIA, mimeType, id, payload);
 	},
 
 	/**
@@ -165,14 +170,14 @@ const ndef = {
 			console.log("WARNING: Expecting an array of NDEF records");
 		}
 
-		return ndef.record(ndef.TNF_WELL_KNOWN, ndef.RTD_SMART_POSTER, id, payload);
+		return ndef.record(ndef.TNF.WELL_KNOWN, ndef.RTD_SMART_POSTER, id, payload);
 	},
 
 	/**
 	 * Helper that creates an empty NDEF record.
 	 *
 	 */
-	emptyRecord: () => ndef.record(ndef.TNF_EMPTY, [], [], []),
+	emptyRecord: () => ndef.record(ndef.TNF.EMPTY, [], [], []),
 
 	/**
 	 * Helper that creates an Android Application Record (AAR).
@@ -181,7 +186,7 @@ const ndef = {
 	 * @param {string} packageName of the application
 	 */
 	androidApplicationRecord: (packageName) =>
-		ndef.record(ndef.TNF_EXTERNAL_TYPE, "android.com:pkg", [], packageName),
+		ndef.record(ndef.TNF.EXTERNAL_TYPE, "android.com:pkg", [], packageName),
 
 	/**
 	 * Encodes an NDEF Message into bytes that can be written to a NFC tag.
@@ -385,21 +390,21 @@ const ndef = {
  */
 function tnfToString(tnf) {
 	switch (tnf) {
-		case ndef.TNF_EMPTY:
+		case ndef.TNF.EMPTY:
 			return "Empty";
-		case ndef.TNF_WELL_KNOWN:
+		case ndef.TNF.WELL_KNOWN:
 			return "Well Known";
-		case ndef.TNF_MIME_MEDIA:
+		case ndef.TNF.MIME_MEDIA:
 			return "Mime Media";
-		case ndef.TNF_ABSOLUTE_URI:
+		case ndef.TNF.ABSOLUTE_URI:
 			return "Absolute URI";
-		case ndef.TNF_EXTERNAL_TYPE:
+		case ndef.TNF.EXTERNAL_TYPE:
 			return "External";
-		case ndef.TNF_UNKNOWN:
+		case ndef.TNF.UNKNOWN:
 			return "Unknown";
-		case ndef.TNF_UNCHANGED:
+		case ndef.TNF.UNCHANGED:
 			return "Unchanged";
-		case ndef.TNF_RESERVED:
+		case ndef.TNF.RESERVED:
 			return "Reserved";
 		default:
 			return tnf?.toString();
@@ -454,28 +459,28 @@ const stringifier = {
 		let result = "";
 
 		switch (record.tnf) {
-			case ndef.TNF_EMPTY:
+			case ndef.TNF.EMPTY:
 				result += "Empty Record";
 				result += separator;
 				break;
-			case ndef.TNF_WELL_KNOWN:
+			case ndef.TNF.WELL_KNOWN:
 				result += stringifier.printWellKnown(record, separator);
 				break;
-			case ndef.TNF_MIME_MEDIA:
+			case ndef.TNF.MIME_MEDIA:
 				result += "MIME Media";
 				result += separator;
 				result += s(record.type);
 				result += separator;
 				result += s(record.payload); // might be binary
 				break;
-			case ndef.TNF_ABSOLUTE_URI:
+			case ndef.TNF.ABSOLUTE_URI:
 				result += "Absolute URI";
 				result += separator;
 				result += s(record.type); // the URI is the type
 				result += separator;
 				result += s(record.payload); // might be binary
 				break;
-			case ndef.TNF_EXTERNAL_TYPE:
+			case ndef.TNF.EXTERNAL_TYPE:
 				// AAR contains strings, other types could
 				// contain binary data
 				result += "External";
@@ -500,7 +505,7 @@ const stringifier = {
 	printWellKnown: (record, separator) => {
 		let result = "";
 
-		if (record.tnf !== ndef.TNF_WELL_KNOWN) {
+		if (record.tnf !== ndef.TNF.WELL_KNOWN) {
 			return "ERROR expecting TNF Well Known";
 		}
 
