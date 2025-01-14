@@ -6,14 +6,13 @@
 // https://github.com/chariotsolutions/phonegap-nfc/blob/master/www/phonegap-nfc.js
 
 function stringToBytes(string) {
-	var bytes = Buffer(string).toJSON();
+	const bytes = Buffer(string).toJSON();
 	if (bytes.hasOwnProperty("data")) {
 		// Node 0.12.x
 		return bytes.data;
-	} else {
+	}
 		// Node 0.10.x
 		return bytes;
-	}
 }
 
 function bytesToString(bytes) {
@@ -22,10 +21,10 @@ function bytesToString(bytes) {
 
 // useful for readable version of Tag UID
 function bytesToHexString(bytes) {
-	var dec,
-		hexstring,
-		bytesAsHexString = "";
-	for (var i = 0; i < bytes.length; i++) {
+	let dec;
+	let hexstring;
+	let bytesAsHexString = "";
+	for (let i = 0; i < bytes.length; i++) {
 		if (bytes[i] >= 0) {
 			dec = bytes[i];
 		} else {
@@ -33,8 +32,8 @@ function bytesToHexString(bytes) {
 		}
 		hexstring = dec.toString(16);
 		// zero padding
-		if (hexstring.length == 1) {
-			hexstring = "0" + hexstring;
+		if (hexstring.length === 1) {
+			hexstring = `0${hexstring}`;
 		}
 		bytesAsHexString += hexstring;
 	}
@@ -43,7 +42,7 @@ function bytesToHexString(bytes) {
 
 // i must be <= 256
 function toHex(i) {
-	var hex;
+	let hex;
 
 	if (i < 0) {
 		i += 256;
@@ -51,8 +50,8 @@ function toHex(i) {
 	hex = i.toString(16);
 
 	// zero padding
-	if (hex.length == 1) {
-		hex = "0" + hex;
+	if (hex.length === 1) {
+		hex = `0${hex}`;
 	}
 	return hex;
 }
@@ -60,9 +59,8 @@ function toHex(i) {
 function toPrintable(i) {
 	if ((i >= 0x20) & (i <= 0x7f)) {
 		return String.fromCharCode(i);
-	} else {
-		return ".";
 	}
+		return ".";
 }
 
 module.exports = {

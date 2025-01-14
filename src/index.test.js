@@ -1,40 +1,40 @@
-var assert = require("assert");
-var ndef = require("./index");
+const assert = require("node:assert");
+const ndef = require("./index");
 
-var textMessageHelloWorld = [
+const textMessageHelloWorld = [
 	209, 1, 15, 84, 2, 101, 110, 104, 101, 108, 108, 111, 44, 32, 119, 111, 114,
 	108, 100,
 ];
-var urlMessageNodeJSorg = [
+const urlMessageNodeJSorg = [
 	209, 1, 11, 85, 3, 110, 111, 100, 101, 106, 115, 46, 111, 114, 103,
 ];
-var absoluteUriWindowsLaunchRecord = [
+const absoluteUriWindowsLaunchRecord = [
 	211, 21, 57, 119, 105, 110, 100, 111, 119, 115, 46, 99, 111, 109, 47, 76, 97,
 	117, 110, 99, 104, 65, 112, 112, 0, 1, 12, 87, 105, 110, 100, 111, 119, 115,
 	80, 104, 111, 110, 101, 38, 123, 102, 53, 56, 55, 52, 50, 53, 50, 45, 49, 102,
 	48, 52, 45, 52, 99, 51, 102, 45, 97, 51, 51, 53, 45, 52, 102, 97, 51, 98, 55,
 	98, 56, 53, 51, 50, 57, 125, 0, 1, 32,
 ];
-var mimeMediaMessage = [
+const mimeMediaMessage = [
 	210, 9, 27, 116, 101, 120, 116, 47, 106, 115, 111, 110, 123, 34, 109, 101,
 	115, 115, 97, 103, 101, 34, 58, 32, 34, 104, 101, 108, 108, 111, 44, 32, 119,
 	111, 114, 108, 100, 34, 125,
 ];
-var multipleRecordMessage = [
+const multipleRecordMessage = [
 	145, 1, 15, 84, 2, 101, 110, 104, 101, 108, 108, 111, 44, 32, 119, 111, 114,
 	108, 100, 17, 1, 11, 85, 3, 110, 111, 100, 101, 106, 115, 46, 111, 114, 103,
 	82, 9, 27, 116, 101, 120, 116, 47, 106, 115, 111, 110, 123, 34, 109, 101, 115,
 	115, 97, 103, 101, 34, 58, 32, 34, 104, 101, 108, 108, 111, 44, 32, 119, 111,
 	114, 108, 100, 34, 125,
 ];
-var emptyMessage = [208, 0, 0];
-var androidApplicationRecordMessage = [
+const emptyMessage = [208, 0, 0];
+const androidApplicationRecordMessage = [
 	0xd4, 0x0f, 0x0e, 0x61, 0x6e, 0x64, 0x72, 0x6f, 0x69, 0x64, 0x2e, 0x63, 0x6f,
 	0x6d, 0x3a, 0x70, 0x6b, 0x67, 0x63, 0x6f, 0x6d, 0x2e, 0x6c, 0x61, 0x75, 0x6e,
 	0x64, 0x72, 0x79, 0x6e, 0x66, 0x63,
 ];
-var threeEmptyMessage = [144, 0, 0, 16, 0, 0, 80, 0, 0];
-var externalMessage = [
+const threeEmptyMessage = [144, 0, 0, 16, 0, 0, 80, 0, 0];
+const externalMessage = [
 	0xd4, 0x0f, 0x03, 0x63, 0x6f, 0x6d, 0x2e, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c,
 	0x65, 0x3a, 0x66, 0x6f, 0x6f, 0x62, 0x61, 0x72,
 ];
@@ -42,9 +42,9 @@ var externalMessage = [
 describe("Encode Message", () => {
 	describe("textRecord", () => {
 		it("should match known message", () => {
-			var message = [ndef.textRecord("hello, world")];
+			const message = [ndef.textRecord("hello, world")];
 
-			var encoded = ndef.encodeMessage(message);
+			const encoded = ndef.encodeMessage(message);
 
 			assert.deepEqual(textMessageHelloWorld, encoded);
 		});
@@ -52,9 +52,9 @@ describe("Encode Message", () => {
 
 	describe("uriRecord", () => {
 		it("should match known message", () => {
-			var message = [ndef.uriRecord("http://nodejs.org")];
+			const message = [ndef.uriRecord("http://nodejs.org")];
 
-			var encoded = ndef.encodeMessage(message);
+			const encoded = ndef.encodeMessage(message);
 
 			assert.deepEqual(urlMessageNodeJSorg, encoded);
 		});
@@ -69,7 +69,7 @@ describe("Encode Message", () => {
 			// [20] 63 33 66 2D 61 33 33 35 2D 34 66 61 33 62 37 62 |c3f-a335-4fa3b7b|
 			// [30] 38 35 33 32 39 7D 00 01 20                      |85329}.. |
 
-			var payload = [
+			const payload = [
 				0x00, 0x01, 0x0c, 0x57, 0x69, 0x6e, 0x64, 0x6f, 0x77, 0x73, 0x50, 0x68,
 				0x6f, 0x6e, 0x65, 0x26, 0x7b, 0x66, 0x35, 0x38, 0x37, 0x34, 0x32, 0x35,
 				0x32, 0x2d, 0x31, 0x66, 0x30, 0x34, 0x2d, 0x34, 0x63, 0x33, 0x66, 0x2d,
@@ -77,9 +77,9 @@ describe("Encode Message", () => {
 				0x38, 0x35, 0x33, 0x32, 0x39, 0x7d, 0x00, 0x01, 0x20,
 			];
 
-			var message = [ndef.absoluteUriRecord("windows.com/LaunchApp", payload)];
+			const message = [ndef.absoluteUriRecord("windows.com/LaunchApp", payload)];
 
-			var encoded = ndef.encodeMessage(message);
+			const encoded = ndef.encodeMessage(message);
 
 			assert.deepEqual(absoluteUriWindowsLaunchRecord, encoded);
 		});
@@ -87,11 +87,11 @@ describe("Encode Message", () => {
 
 	describe("mimeMediaRecord", () => {
 		it("should match known message", () => {
-			var message = [
+			const message = [
 				ndef.mimeMediaRecord("text/json", '{"message": "hello, world"}'),
 			];
 
-			var encoded = ndef.encodeMessage(message);
+			const encoded = ndef.encodeMessage(message);
 
 			assert.deepEqual(mimeMediaMessage, encoded);
 		});
@@ -99,9 +99,9 @@ describe("Encode Message", () => {
 
 	describe("emptyRecord", () => {
 		it("should match known message", () => {
-			var message = [ndef.emptyRecord()];
+			const message = [ndef.emptyRecord()];
 
-			var encoded = ndef.encodeMessage(message);
+			const encoded = ndef.encodeMessage(message);
 
 			assert.deepEqual(emptyMessage, encoded);
 		});
@@ -109,10 +109,10 @@ describe("Encode Message", () => {
 
 	describe("androidApplicationRecord", () => {
 		it("should match known message", () => {
-			var packageName = "com.laundrynfc";
-			var message = [ndef.androidApplicationRecord(packageName)];
+			const packageName = "com.laundrynfc";
+			const message = [ndef.androidApplicationRecord(packageName)];
 
-			var encoded = ndef.encodeMessage(message);
+			const encoded = ndef.encodeMessage(message);
 
 			assert.deepEqual(androidApplicationRecordMessage, encoded);
 		});
@@ -120,13 +120,13 @@ describe("Encode Message", () => {
 
 	describe("multipleEmptyRecords", () => {
 		it("should match known message", () => {
-			var message = [
+			const message = [
 				ndef.emptyRecord(),
 				ndef.emptyRecord(),
 				ndef.emptyRecord(),
 			];
 
-			var encoded = ndef.encodeMessage(message);
+			const encoded = ndef.encodeMessage(message);
 
 			assert.deepEqual(threeEmptyMessage, encoded);
 		});
@@ -134,13 +134,13 @@ describe("Encode Message", () => {
 
 	describe("multipleRecords", () => {
 		it("should match known message", () => {
-			var message = [
+			const message = [
 				ndef.textRecord("hello, world"),
 				ndef.uriRecord("http://nodejs.org"),
 				ndef.mimeMediaRecord("text/json", '{"message": "hello, world"}'),
 			];
 
-			var encoded = ndef.encodeMessage(message);
+			const encoded = ndef.encodeMessage(message);
 
 			assert.deepEqual(multipleRecordMessage, encoded);
 		});
@@ -150,11 +150,11 @@ describe("Encode Message", () => {
 describe("Decode Message", () => {
 	describe("textRecord", () => {
 		it("should match known record", () => {
-			var decodedMessage = ndef.decodeMessage(textMessageHelloWorld);
+			const decodedMessage = ndef.decodeMessage(textMessageHelloWorld);
 			assert.equal(1, decodedMessage.length);
 
-			var record = ndef.textRecord("hello, world");
-			var decodedRecord = decodedMessage[0];
+			const record = ndef.textRecord("hello, world");
+			const decodedRecord = decodedMessage[0];
 
 			assert.equal(record.tnf, decodedRecord.tnf);
 			assert.equal(record.type, decodedRecord.type);
@@ -164,11 +164,11 @@ describe("Decode Message", () => {
 
 	describe("uriRecord", () => {
 		it("should match known record", () => {
-			var decodedMessage = ndef.decodeMessage(urlMessageNodeJSorg);
+			const decodedMessage = ndef.decodeMessage(urlMessageNodeJSorg);
 			assert.equal(1, decodedMessage.length);
 
-			var record = ndef.uriRecord("http://nodejs.org");
-			var decodedRecord = decodedMessage[0];
+			const record = ndef.uriRecord("http://nodejs.org");
+			const decodedRecord = decodedMessage[0];
 
 			assert.equal(record.tnf, decodedRecord.tnf);
 			assert.equal(record.type, decodedRecord.type);
@@ -179,7 +179,7 @@ describe("Decode Message", () => {
 
 describe("decodeMessage", () => {
 	it("should not be destructive", () => {
-		var decodedMessage = ndef.decodeMessage(textMessageHelloWorld);
+		let decodedMessage = ndef.decodeMessage(textMessageHelloWorld);
 		assert.equal(1, decodedMessage.length);
 
 		decodedMessage = ndef.decodeMessage(textMessageHelloWorld);
@@ -187,7 +187,7 @@ describe("decodeMessage", () => {
 	});
 
 	it("should decode multiple records", () => {
-		var decodedMessage = ndef.decodeMessage(multipleRecordMessage);
+		const decodedMessage = ndef.decodeMessage(multipleRecordMessage);
 		assert.equal(3, decodedMessage.length);
 
 		assert.equal(ndef.TNF_WELL_KNOWN, decodedMessage[0].tnf);
@@ -212,9 +212,9 @@ describe("decodeMessage", () => {
 
 describe("stringify", () => {
 	it("should stringify messages", () => {
-		var message = [ndef.textRecord("hello, world")];
+		let message = [ndef.textRecord("hello, world")];
 
-		var string = ndef.stringify(message);
+		let string = ndef.stringify(message);
 
 		assert.equal("Text Record\nhello, world\n", string);
 
@@ -232,14 +232,14 @@ describe("stringify", () => {
 	});
 
 	it("should stringify smartposters", () => {
-		var message = [
+		const message = [
 			ndef.smartPoster([
 				ndef.uriRecord("http://www.example.com"),
 				ndef.textRecord("hello, world"),
 			]),
 		];
 
-		var string = ndef.stringify(message);
+		const string = ndef.stringify(message);
 
 		// ideally the inner message would be indented
 		assert.equal(
@@ -249,21 +249,21 @@ describe("stringify", () => {
 	});
 
 	it("should stringify records", () => {
-		var record = ndef.textRecord("hello, world");
-		var string = ndef.stringify(record);
+		const record = ndef.textRecord("hello, world");
+		const string = ndef.stringify(record);
 
 		assert.equal("Text Record\nhello, world\n", string);
 	});
 
 	it("should reject invalid records", () => {
-		var record = ndef.record(17, [], [], []);
-		var string = ndef.stringify(record);
+		const record = ndef.record(17, [], [], []);
+		const string = ndef.stringify(record);
 
 		assert.equal("Can't process TNF 17\n", string);
 	});
 
 	it("only handles some well known types", () => {
-		var record = ndef.record(
+		const record = ndef.record(
 			ndef.TNF_WELL_KNOWN,
 			ndef.RTD_HANDOVER_REQUEST,
 			[0x48, 0x72],
@@ -272,23 +272,23 @@ describe("stringify", () => {
 				0x63, 0x01, 0x01, 0x62, 0x00,
 			],
 		);
-		var string = ndef.stringify(record);
+		const string = ndef.stringify(record);
 
 		assert.equal(0, string.indexOf("Hr Record"));
 	});
 
 	it("should do something sensible with message bytes", () => {
-		var message = [ndef.textRecord("hello, world")];
+		const message = [ndef.textRecord("hello, world")];
 
-		var bytes = ndef.encodeMessage(message);
+		const bytes = ndef.encodeMessage(message);
 
-		var string = ndef.stringify(bytes);
+		const string = ndef.stringify(bytes);
 
 		assert.equal("Text Record\nhello, world\n", string);
 	});
 
 	it("should handle empty array", () => {
-		var string = ndef.stringify([]);
+		const string = ndef.stringify([]);
 		assert.equal("", string);
 	});
 });
@@ -323,38 +323,38 @@ describe("TNF to String", () => {
 
 describe("Record Type", () => {
 	it("can be a String", () => {
-		var message = [
+		const message = [
 			ndef.record(ndef.TNF_EXTERNAL_TYPE, "com.example:foo", [], "bar"),
 		];
 
-		var encoded = ndef.encodeMessage(message);
+		const encoded = ndef.encodeMessage(message);
 
 		assert.deepEqual(externalMessage, encoded);
 	});
 
 	it("can be an Array", () => {
-		var message = [
+		const message = [
 			ndef.record(ndef.TNF_EXTERNAL_TYPE, "com.example:foo", [], "bar"),
 		];
 
-		var encoded = ndef.encodeMessage(message);
+		const encoded = ndef.encodeMessage(message);
 
 		assert.deepEqual(externalMessage, encoded);
 	});
 
 	it("should allow UTF-8", () => {
-		var message = [
+		const message = [
 			ndef.record(ndef.TNF_ABSOLUTE_URI, "✓", [], "type is utf-8"),
 		];
 
-		var encoded = ndef.encodeMessage(message);
-		var expectedBytes = [
+		const encoded = ndef.encodeMessage(message);
+		const expectedBytes = [
 			211, 3, 13, 226, 156, 147, 116, 121, 112, 101, 32, 105, 115, 32, 117, 116,
 			102, 45, 56,
 		];
 		assert.deepEqual(expectedBytes, encoded);
 
-		var decoded = ndef.decodeMessage(encoded);
+		const decoded = ndef.decodeMessage(encoded);
 		assert.equal(decoded[0].type, "✓");
 	});
 });

@@ -1,17 +1,17 @@
-var assert = require("assert"),
-	uriHelper = require("./ndef-uri"),
-	util = require("./ndef-util");
+const assert = require("node:assert");
+const uriHelper = require("./ndef-uri");
+const util = require("./ndef-util");
 
 describe("NDEF URI Encoder", () => {
 	it("should encode URIs", () => {
-		var encoded = uriHelper.encodePayload("http://arduino.cc");
+		const encoded = uriHelper.encodePayload("http://arduino.cc");
 		assert.equal(3, encoded[0]); // prefix
 		assert.equal(11, encoded.length);
 	});
 
 	it("should use first match", () => {
 		// should substitute http://www. not http://
-		var encoded = uriHelper.encodePayload("http://www.arduino.cc");
+		let encoded = uriHelper.encodePayload("http://www.arduino.cc");
 		assert.equal(1, encoded[0]); // prefix
 		assert.equal(11, encoded.length);
 
@@ -22,34 +22,34 @@ describe("NDEF URI Encoder", () => {
 	});
 
 	it("should encode unknown prefixes", () => {
-		var encoded = uriHelper.encodePayload("foo://bar");
+		const encoded = uriHelper.encodePayload("foo://bar");
 		assert.equal(0, encoded[0]); // prefix
 		assert.equal(10, encoded.length);
 	});
 
 	it("should encode bogus data", () => {
-		var encoded = uriHelper.encodePayload("qwerty");
+		const encoded = uriHelper.encodePayload("qwerty");
 		assert.equal(0, encoded[0]); // prefix
 		assert.equal(7, encoded.length);
 	});
 
 	it("should encode strange protocols", () => {
-		var encoded = uriHelper.encodePayload("urn:epc:raw:somedata");
+		const encoded = uriHelper.encodePayload("urn:epc:raw:somedata");
 		assert.equal(33, encoded[0]); // prefix
 		assert.equal(9, encoded.length);
 	});
 });
 
 function getBytes(prefix, string) {
-	var bytes = util.stringToBytes(string);
+	const bytes = util.stringToBytes(string);
 	bytes.unshift(prefix);
 	return bytes;
 }
 
 describe("NDEF URI Decoder", () => {
 	it("should decode URIs", () => {
-		var bytes = getBytes(0, "http://arduino.cc");
-		var decoded = uriHelper.decodePayload(bytes);
+		let bytes = getBytes(0, "http://arduino.cc");
+		let decoded = uriHelper.decodePayload(bytes);
 		assert.equal("http://arduino.cc", decoded);
 
 		bytes = getBytes(1, "arduino.cc");
@@ -71,7 +71,7 @@ describe("NDEF URI Decoder", () => {
 
 	// not sure if this is a good idea
 	it("should decode strings", () => {
-		var decoded = uriHelper.decodePayload("0http://arduino.cc");
+		let decoded = uriHelper.decodePayload("0http://arduino.cc");
 		assert.equal("http://arduino.cc", decoded);
 
 		decoded = uriHelper.decodePayload("3arduino.cc");
@@ -79,8 +79,8 @@ describe("NDEF URI Decoder", () => {
 	});
 
 	it("should handle invalid prefixes", () => {
-		var bytes = getBytes(36, "foo");
-		var decoded = uriHelper.decodePayload(bytes);
+		let bytes = getBytes(36, "foo");
+		let decoded = uriHelper.decodePayload(bytes);
 		assert.equal("foo", decoded);
 
 		bytes = getBytes(0xff, "foo");

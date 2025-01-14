@@ -3,11 +3,11 @@
 //
 // This code is from phonegap-nfc.js https://github.com/don/phonegap-nfc
 
-var util = require("./ndef-util"),
-	textHelper = require("./ndef-text"),
-	uriHelper = require("./ndef-uri");
+const util = require("./ndef-util");
+const textHelper = require("./ndef-text");
+const uriHelper = require("./ndef-uri");
 
-var ndef = {
+const ndef = {
 	// see android.nfc.NdefRecord for documentation about constants
 	// http://developer.android.com/reference/android/nfc/NdefRecord.html
 	TNF_EMPTY: 0x0,
@@ -55,21 +55,21 @@ var ndef = {
 		}
 
 		// store type as String so it's easier to compare
-		if (type instanceof Array) {
+		if (Array.isArray(type)) {
 			type = util.bytesToString(type);
 		}
 
 		// in the future, id could be a String
-		if (!(id instanceof Array)) {
+		if (!(Array.isArray(id))) {
 			id = util.stringToBytes(id);
 		}
 
 		// Payload must be binary
-		if (!(payload instanceof Array)) {
+		if (!(Array.isArray(payload))) {
 			payload = util.stringToBytes(payload);
 		}
 
-		var record = {
+		const record = {
 			tnf: tnf,
 			type: type,
 			id: id,
@@ -100,7 +100,7 @@ var ndef = {
 	 * @id byte[] (optional)
 	 */
 	textRecord: (text, languageCode, id) => {
-		var payload = textHelper.encodePayload(text, languageCode);
+		const payload = textHelper.encodePayload(text, languageCode);
 		if (!id) {
 			id = [];
 		}
@@ -115,7 +115,7 @@ var ndef = {
 	 * @id byte[] (optional)
 	 */
 	uriRecord: (uri, id) => {
-		var payload = uriHelper.encodePayload(uri);
+		const payload = uriHelper.encodePayload(uri);
 		if (!id) {
 			id = [];
 		}
@@ -176,7 +176,7 @@ var ndef = {
 	 * @id byte[] (optional)
 	 */
 	smartPoster: (ndefRecords, id) => {
-		var payload = [];
+		let payload = [];
 
 		if (!id) {
 			id = [];
@@ -228,17 +228,17 @@ var ndef = {
 	 * @see NFC Data Exchange Format (NDEF) http://www.nfc-forum.org/specs/spec_list/
 	 */
 	encodeMessage: (ndefRecords) => {
-		var encoded = [],
-			tnf_byte,
-			record_type,
-			payload_length,
-			id_length,
-			i,
-			mb,
-			me, // messageBegin, messageEnd
-			cf = false, // chunkFlag TODO implement
-			sr, // boolean shortRecord
-			il; // boolean idLengthFieldIsPresent
+		let encoded = [];
+		let tnf_byte;
+		let record_type;
+		let payload_length;
+		let id_length;
+		let i;
+		let mb;
+		let me; // messageBegin, messageEnd
+		const cf = false; // chunkFlag TODO implement
+		let sr; // boolean shortRecord
+		let il; // boolean idLengthFieldIsPresent
 
 		for (i = 0; i < ndefRecords.length; i++) {
 			mb = i === 0;
@@ -292,11 +292,11 @@ var ndef = {
 	 */
 	decodeMessage: (ndefBytes) => {
 		// ndefBytes can be an array of bytes e.g. [0x03, 0x31, 0xd1] or a Buffer
-		var bytes;
+		let bytes;
 		if (ndefBytes instanceof Buffer) {
 			// get an array of bytes
 			bytes = Array.prototype.slice.call(ndefBytes, 0);
-		} else if (ndefBytes instanceof Array) {
+		} else if (Array.isArray(ndefBytes)) {
 			bytes = ndefBytes.slice(0);
 		} else {
 			throw new Error(
@@ -304,16 +304,16 @@ var ndef = {
 			);
 		}
 
-		var bytes = bytes.slice(0), // clone since parsing is destructive
-			ndef_message = [],
-			tnf_byte,
-			header,
-			type_length = 0,
-			payload_length = 0,
-			id_length = 0,
-			record_type = [],
-			id = [],
-			payload = [];
+		const bytes = bytes.slice(0); // clone since parsing is destructive
+		const ndef_message = [];
+		let tnf_byte;
+		let header;
+		let type_length = 0;
+		let payload_length = 0;
+		let id_length = 0;
+		let record_type = [];
+		let id = [];
+		let payload = [];
 
 		while (bytes.length) {
 			tnf_byte = bytes.shift();
@@ -372,7 +372,7 @@ var ndef = {
 	 *  See NFC Data Exchange Format (NDEF) Specification Section 3.2 RecordLayout
 	 */
 	encodeTnf: (mb, me, cf, sr, il, tnf) => {
-		var value = tnf;
+		let value = tnf;
 
 		if (mb) {
 			value = value | 0x80;
@@ -408,7 +408,7 @@ var ndef = {
 };
 
 function tnfToString(tnf) {
-	var value = tnf;
+	let value = tnf;
 
 	switch (tnf) {
 		case ndef.TNF_EMPTY:
@@ -443,7 +443,7 @@ function tnfToString(tnf) {
 // This works OK for demos, but real code proably needs
 // a custom implementation. It would be nice to make
 // smarter record objects that can print themselves
-var stringifier = {
+const stringifier = {
 	stringify: (data, separator) => {
 		if (Array.isArray(data)) {
 			if (typeof data[0] === "number") {
@@ -452,9 +452,8 @@ var stringifier = {
 			}
 
 			return stringifier.printRecords(data, separator);
-		} else {
-			return stringifier.printRecord(data, separator);
 		}
+			return stringifier.printRecord(data, separator);
 	},
 
 	// @message - NDEF Message (array of NDEF Records)
@@ -479,7 +478,7 @@ var stringifier = {
 	// @separator - line separator, optional, defaults to \n
 	// @returns string with NDEF Record
 	printRecord: (record, separator) => {
-		var result = "";
+		let result = "";
 
 		if (!separator) {
 			separator = "\n";
@@ -517,7 +516,7 @@ var stringifier = {
 				result += s(record.payload);
 				break;
 			default:
-				result += s("Can't process TNF " + record.tnf);
+				result += s(`Can't process TNF ${record.tnf}`);
 		}
 
 		result += separator;
@@ -525,7 +524,7 @@ var stringifier = {
 	},
 
 	printWellKnown: (record, separator) => {
-		var result = "";
+		let result = "";
 
 		if (record.tnf !== ndef.TNF_WELL_KNOWN) {
 			return "ERROR expecting TNF Well Known";
@@ -550,7 +549,7 @@ var stringifier = {
 				break;
 			default:
 				// attempt to display other types
-				result += record.type + " Record";
+				result += `${record.type} Record`;
 				result += separator;
 				result += s(record.payload);
 		}

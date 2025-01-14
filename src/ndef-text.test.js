@@ -1,9 +1,9 @@
-var assert = require("assert"),
-	textHelper = require("./ndef-text");
+const assert = require("node:assert");
+const textHelper = require("./ndef-text");
 
 describe("NDEF Text Encoder", () => {
 	it("should encode text with default lang", () => {
-		var encoded = textHelper.encodePayload("hello, world");
+		const encoded = textHelper.encodePayload("hello, world");
 		assert.equal(2, encoded[0]);
 		assert.equal(101, encoded[1]); // e
 		assert.equal(110, encoded[2]); // n
@@ -11,7 +11,7 @@ describe("NDEF Text Encoder", () => {
 	});
 
 	it("should use supplied language", () => {
-		var encoded = textHelper.encodePayload("hello, world", "en");
+		let encoded = textHelper.encodePayload("hello, world", "en");
 		assert.equal(2, encoded[0]);
 		assert.equal(101, encoded[1]); // e
 		assert.equal(110, encoded[2]); // n
@@ -31,7 +31,7 @@ describe("NDEF Text Encoder", () => {
 	});
 
 	it("should encode language code length as a byte", () => {
-		var encoded = textHelper.encodePayload(
+		const encoded = textHelper.encodePayload(
 			"hello, world",
 			"abcdefghijklmnopqrstuvwxyz",
 		);
@@ -47,7 +47,7 @@ describe("NDEF Text Encoder", () => {
 
 describe("NDEF Text Decoder", () => {
 	it("should decode Text", () => {
-		var encoded = [
+		const encoded = [
 			2, 101, 110, 104, 101, 108, 108, 111, 44, 32, 119, 111, 114, 108, 100,
 		];
 		decoded = textHelper.decodePayload(encoded);
@@ -56,7 +56,7 @@ describe("NDEF Text Decoder", () => {
 
 	it("should handle UTF-16 bit in status byte", () => {
 		// this test is sort of bogus because text is not UTF-16
-		var encoded = [
+		const encoded = [
 			130, 101, 110, 104, 101, 108, 108, 111, 44, 32, 119, 111, 114, 108, 100,
 		];
 		decoded = textHelper.decodePayload(encoded);

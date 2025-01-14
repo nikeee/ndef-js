@@ -7,17 +7,17 @@
 //     $ nfc-mfclassic r b dump.mfd
 
 // Mifare Classic Block Size
-var BLOCK_SIZE = 16;
+const BLOCK_SIZE = 16;
 
 // NDEF TLV starts at the 4th block
-var TLV_START = BLOCK_SIZE * 4;
+const TLV_START = BLOCK_SIZE * 4;
 
 // NDEF Type and Length are 4 bytes
-var TL_LENGTH = 4;
+const TL_LENGTH = 4;
 
 function getNdefLength(rawTagData) {
-	var b = rawTagData.slice(TLV_START, TLV_START + TL_LENGTH),
-		length = -1;
+	const b = rawTagData.slice(TLV_START, TLV_START + TL_LENGTH);
+	let length = -1;
 
 	// 2 ways to encode length
 	// short - [0x0, 0x0, 0x3, length];
@@ -40,19 +40,18 @@ function getNdefLength(rawTagData) {
 function isTrailingBlock(blockNumber) {
 	if (blockNumber < 32 * 4) {
 		return (blockNumber + 1) % 4 === 0;
-	} else {
-		return (blockNumber + 1) % 16 === 0;
 	}
+		return (blockNumber + 1) % 16 === 0;
 }
 
 function getNdefData(rawTagData) {
-	var messageLength = getNdefLength(rawTagData),
-		buffer = new Buffer(rawTagData.length), // could be messageLength + BLOCK_SIZE * 4
-		sourceStart = 0,
-		targetStart = 0,
-		messageStart,
-		messageEnd,
-		i;
+	const messageLength = getNdefLength(rawTagData);
+	const buffer = new Buffer(rawTagData.length); // could be messageLength + BLOCK_SIZE * 4
+	let sourceStart = 0;
+	let targetStart = 0;
+	let messageStart;
+	let messageEnd;
+	let i;
 
 	for (i = 0; i < 256; i++) {
 		if (!isTrailingBlock(i)) {
@@ -77,10 +76,9 @@ function getNdefData(rawTagData) {
 	messageEnd = messageStart + messageLength;
 
 	// verify NDEF TLV end
-	if (buffer[messageEnd] != "0xfe") {
+	if (buffer[messageEnd] !== "0xfe") {
 		console.log(
-			"WARNING: End of message does not look correct. Expecting 0xFE but got " +
-				buffer[messageEnd],
+			`WARNING: End of message does not look correct. Expecting 0xFE but got ${buffer[messageEnd]}`,
 		);
 	}
 

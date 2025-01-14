@@ -1,8 +1,8 @@
-var util = require("./ndef-util");
+const util = require("./ndef-util");
 
 // URI identifier codes from URI Record Type Definition NFCForum-TS-RTD_URI_1.0 2006-07-24
 // index in array matches code in the spec
-var protocols = [
+const protocols = [
 	"",
 	"http://www.",
 	"https://www.",
@@ -44,7 +44,7 @@ var protocols = [
 // decode a URI payload bytes
 // @returns a string
 function decode(data) {
-	var prefix = protocols[data[0]];
+	let prefix = protocols[data[0]];
 	if (!prefix) {
 		// 36 to 255 should be ""
 		prefix = "";
@@ -55,7 +55,9 @@ function decode(data) {
 // shorten a URI with standard prefix
 // @returns an array of bytes
 function encode(uri) {
-	var prefix, protocolCode, encoded;
+	let prefix;
+	let protocolCode;
+	let encoded;
 
 	// check each protocol, unless we've found a match
 	// "urn:" is the one exception where we need to keep checking
