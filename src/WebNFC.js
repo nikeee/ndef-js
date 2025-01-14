@@ -130,7 +130,7 @@ const urlPrefixes = [
  *
  * @param {string} value
  * @param {string[]} prefixes
- * @returns {[number, string]}
+ * @returns {number}
  */
 function findLongestPrefix(value, prefixes) {
 	if (prefixes.length === 0) {
@@ -146,7 +146,7 @@ function findLongestPrefix(value, prefixes) {
 			longestPrefixLength = p.length;
 		}
 	}
-	return [longestPrefixIndex, prefixes[longestPrefixIndex]];
+	return longestPrefixIndex;
 }
 
 /**
@@ -482,13 +482,12 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 			type = new Uint8Array([0x55]); // "U"
 
 			const serializedUrl = textDecoder.decode(record.data.buffer);
-			const [prefixNumber, prefix] = findLongestPrefix(
-				serializedUrl,
-				urlPrefixes,
-			);
+			const prefixNumber = findLongestPrefix(serializedUrl, urlPrefixes);
 
 			const shortenedUrl =
-				prefix.length > 0 ? serializedUrl.slice(prefix.length) : prefix;
+				prefixNumber > 0
+					? serializedUrl.slice(urlPrefixes[prefixNumber].length)
+					: serializedUrl;
 
 			payload = new Uint8Array([
 				prefixNumber,
@@ -511,10 +510,6 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 			throw new Error("Unsupported recordType");
 	}
 
-	// URL:
-	/*
-	 */
-
 	const header = {
 		mb: recordIndex === 0,
 		me: recordIndex === recordCount - 1,
@@ -524,7 +519,6 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 		tnf,
 	};
 
-	// @ts-ignore
 	const headerByte =
 		(header.mb ? 0b10000_000 : 0) |
 		(header.me ? 0b01000_000 : 0) |
