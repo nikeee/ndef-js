@@ -422,9 +422,7 @@ const ndef = {
 					(0xff & bytes.shift());
 			}
 
-			if (header.il) {
-				id_length = bytes.shift();
-			}
+			id_length = header.il ? bytes.shift() : 0;
 
 			record_type = bytes.splice(0, type_length);
 			id = bytes.splice(0, id_length);
