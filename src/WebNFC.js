@@ -82,8 +82,8 @@ export function createNdefMessage(message) {
  * @returns {NDEFMessage}
  */
 function createNdefMessageInner(source, context, recordsDepth) {
-	// See:
-	// https://w3c.github.io/web-nfc/#creating-ndef-message
+	// See: https://w3c.github.io/web-nfc/#creating-ndef-message
+
 	if (typeof source === "string") {
 		return {
 			records: [
