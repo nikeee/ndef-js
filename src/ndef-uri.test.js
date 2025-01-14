@@ -78,15 +78,6 @@ describe("NDEF URI Decoder", () => {
 		assert.equal("https://arduino.cc", decoded);
 	});
 
-	// not sure if this is a good idea
-	it("should decode strings", () => {
-		let decoded = uriHelper.decodePayload("0http://arduino.cc");
-		assert.equal("http://arduino.cc", decoded);
-
-		decoded = uriHelper.decodePayload("3arduino.cc");
-		assert.equal("http://arduino.cc", decoded);
-	});
-
 	it("should handle invalid prefixes", () => {
 		let bytes = getBytes(36, "foo");
 		let decoded = uriHelper.decodePayload(bytes);

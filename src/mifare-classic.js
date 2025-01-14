@@ -90,7 +90,7 @@ export function getNdefData(rawTagData) {
 	messageEnd = messageStart + messageLength;
 
 	// verify NDEF TLV end
-	if (buffer[messageEnd] !== "0xfe") {
+	if (buffer[messageEnd] !== 0xfe) {
 		console.log(
 			`WARNING: End of message does not look correct. Expecting 0xFE but got ${buffer[messageEnd]}`,
 		);
