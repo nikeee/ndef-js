@@ -378,6 +378,14 @@ function createNdefRecordInner(record, context, recordsDepth) {
 			};
 		}
 
+		case "smart-poster":
+			throw new Error("Not implemented");
+		// @ts-ignore
+		case "absolute-url": // TODO
+			throw new Error("Not implemented");
+		case "unknown":
+			throw new Error("Not implemented");
+
 		default:
 			throw new TypeError("Unsupported recordType");
 	}
@@ -453,6 +461,13 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 			header.tnf = TNF.MIME_MEDIA;
 			type = new Uint8Array(0); // TODO: Serialize mime type: https://mimesniff.spec.whatwg.org/#serialize-a-mime-type
 			break;
+		case "smart-poster":
+			throw new Error("Not implemented");
+		// @ts-ignore
+		case "absolute-url": // TODO
+			throw new Error("Not implemented");
+		case "unknown":
+			throw new Error("Not implemented");
 		default:
 			throw new Error("Unsupported recordType");
 	}
