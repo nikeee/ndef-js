@@ -96,6 +96,18 @@ function createNdefMessageInner(source, context, recordsDepth) {
 		};
 	}
 
+	if (isBufferSource(source)) {
+		return {
+			records: [
+				createNdefRecord({
+					recordType: "mime",
+					mediaType: "application/octet-stream",
+					data: source,
+				}),
+			],
+		};
+	}
+
 	if ("records" in source && Array.isArray(source.records)) {
 		if (source.records.length === 0) {
 			throw new TypeError("The given message is empty");
@@ -110,18 +122,6 @@ function createNdefMessageInner(source, context, recordsDepth) {
 			records: source.records.map((r) =>
 				createNdefRecordInner(r, context, newRecordsDepth),
 			),
-		};
-	}
-
-	if (isBufferSource(source)) {
-		return {
-			records: [
-				createNdefRecord({
-					recordType: "mime",
-					mediaType: "application/octet-stream",
-					data: source,
-				}),
-			],
 		};
 	}
 
