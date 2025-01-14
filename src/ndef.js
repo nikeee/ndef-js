@@ -40,7 +40,7 @@ const stringifier = {
 	/**
 	 *
 	 * @param {any[]} data
-	 * @param {string} separator
+	 * @param {string} [separator] line separator, defaults to "\n".
 	 * @returns {string}
 	 */
 	stringify: (data, separator) => {
@@ -57,7 +57,7 @@ const stringifier = {
 
 	/**
 	 * @param {{ tnf: any; type: any; payload: number[]; }[]} message NDEF Message (array of NDEF Records)
-	 * @param {string} separator line separator, optional, defaults to \n
+	 * @param {string} [separator] line separator, defaults to "\n".
 	 * @returns {string} string with NDEF Message
 	 */
 	printRecords: (/** @type {any} */ message, separator = "\n") => {
@@ -73,7 +73,7 @@ const stringifier = {
 
 	/**
 	 * @param {{ tnf: any; type: any; payload: number[]; }} record NDEF Record
-	 * @param {string | undefined} separator line separator, optional, defaults to \n
+	 * @param {string} [separator] line separator, defaults to "\n".
 	 * @returns {string} string with NDEF Record
 	 */
 	printRecord: (record, separator = "\n") => {
@@ -224,8 +224,8 @@ const ndef = {
 	 * Helper that creates an NDEF record containing plain text.
 	 *
 	 * @param {string} text String of text to encode
-	 * @param {string} languageCode ISO/IANA language code. Examples: “fi”, “en-US”, “fr-CA”, “jp”. (optional)
-	 * @param {number[] | undefined} id
+	 * @param {string} [languageCode] ISO/IANA language code. Examples: "fi", "en-US", "fr-CA", "jp".
+	 * @param {number[]} [id]
 	 */
 	textRecord: (text, languageCode, id = []) => {
 		const payload = textHelper.encodePayload(text, languageCode);
@@ -236,7 +236,7 @@ const ndef = {
 	 * Helper that creates a NDEF record containing a URI.
 	 *
 	 * @param {string} uri
-	 * @param {number[] | undefined} id
+	 * @param {number[]} [id]
 	 */
 	uriRecord: (uri, id = []) => {
 		const payload = uriHelper.encodePayload(uri);
@@ -264,7 +264,7 @@ const ndef = {
 	 *
 	 * @param {string} uri
 	 * @param {number[]} payload
-	 * @param {number[] | undefined} id
+	 * @param {number[]} [id]
 	 */
 	absoluteUriRecord: (uri, payload = [], id = []) => {
 		return ndef.record(ndef.TNF.ABSOLUTE_URI, uri, id, payload);
@@ -275,7 +275,7 @@ const ndef = {
 	 *
 	 * @param {string} mimeType
 	 * @param {number[]} payload
-	 * @param {number[] | undefined} id
+	 * @param {number[]} [id]
 	 */
 	mimeMediaRecord: (mimeType, payload, id = []) => {
 		return ndef.record(ndef.TNF.MIME_MEDIA, mimeType, id, payload);
@@ -285,7 +285,7 @@ const ndef = {
 	 * Helper that creates an NDEF record containing an Smart Poster.
 	 *
 	 * @param {object[]} ndefRecords array of NDEF Records
-	 * @param {number[] | undefined} id
+	 * @param {number[]} [id]
 	 */
 	smartPoster: (ndefRecords, id = []) => {
 		let payload = [];
@@ -327,10 +327,9 @@ const ndef = {
 	 * Encodes an NDEF Message into bytes that can be written to a NFC tag.
 	 *
 	 * @param {any[]} ndefRecords an Array of NDEF Records
-	 *
 	 * @returns {number[]} byte array
 	 *
-	 * @see NFC Data Exchange Format (NDEF) http://www.nfc-forum.org/specs/spec_list/
+	 * @remarks NFC Data Exchange Format (NDEF) http://www.nfc-forum.org/specs/spec_list/
 	 */
 	encodeMessage: (ndefRecords) => {
 		/** @type {any[]} */
@@ -391,10 +390,9 @@ const ndef = {
 	 * Decodes an array bytes into an NDEF Message
 	 *
 	 * @param {number[]} ndefBytes an array bytes or Buffer that was read from a NFC tag
+	 * @returns {object[]} array of NDEF Records
 	 *
-	 * @returns array of NDEF Records
-	 *
-	 * @see NFC Data Exchange Format (NDEF) http://www.nfc-forum.org/specs/spec_list/
+	 * @remarks NFC Data Exchange Format (NDEF) http://www.nfc-forum.org/specs/spec_list/
 	 */
 	decodeMessage: (ndefBytes) => {
 		// ndefBytes can be an array of bytes e.g. [0x03, 0x31, 0xd1] or a Buffer
