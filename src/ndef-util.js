@@ -7,24 +7,30 @@
 // This is from phonegap-nfc.js and is a combination of helpers in nfc and util
 // https://github.com/chariotsolutions/phonegap-nfc/blob/master/www/phonegap-nfc.js
 
+/**
+ * @param {string} string
+ * @returns {number[]}
+ */
 export function stringToBytes(string) {
-	const bytes = Buffer(string).toJSON();
-	if (bytes.hasOwnProperty("data")) {
-		// Node 0.12.x
-		return bytes.data;
-	}
-	// Node 0.10.x
-	return bytes;
+	return Buffer.from(string).toJSON().data;
 }
 
+/**
+ * @param {number[]} bytes
+ * @returns {string}
+ */
 export function bytesToString(bytes) {
-	return Buffer(bytes).toString();
+	return Buffer.from(bytes).toString();
 }
 
-// useful for readable version of Tag UID
+/**
+ * useful for readable version of Tag UID
+ * @param {number[]} bytes
+ * @returns
+ */
 export function bytesToHexString(bytes) {
 	let dec;
-	let hexstring;
+	let hexString;
 	let bytesAsHexString = "";
 	for (let i = 0; i < bytes.length; i++) {
 		if (bytes[i] >= 0) {
@@ -32,17 +38,20 @@ export function bytesToHexString(bytes) {
 		} else {
 			dec = 256 + bytes[i];
 		}
-		hexstring = dec.toString(16);
+		hexString = dec.toString(16);
 		// zero padding
-		if (hexstring.length === 1) {
-			hexstring = `0${hexstring}`;
+		if (hexString.length === 1) {
+			hexString = `0${hexString}`;
 		}
-		bytesAsHexString += hexstring;
+		bytesAsHexString += hexString;
 	}
 	return bytesAsHexString;
 }
 
-// i must be <= 256
+/**
+ * @param {number} i i must be <= 256
+ * @returns {string}
+ */
 export function toHex(i) {
 	let hex;
 
@@ -58,8 +67,12 @@ export function toHex(i) {
 	return hex;
 }
 
+/**
+ * @param {number} i
+ * @returns {string}
+ */
 export function toPrintable(i) {
-	if ((i >= 0x20) & (i <= 0x7f)) {
+	if (i >= 0x20 && i <= 0x7f) {
 		return String.fromCharCode(i);
 	}
 	return ".";
