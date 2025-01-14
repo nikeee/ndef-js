@@ -168,6 +168,22 @@ function createNdefRecordInner(record, context, recordsDepth) {
 }
 
 /**
+ * See [android.nfc.NdefRecord](https://developer.android.com/reference/android/nfc/NdefRecord) for documentation about constants.
+ *
+ * @typedef {keyof TNF} TNFType
+ */
+const TNF = /* @__PURE__ */ Object.freeze({
+	EMPTY: 0,
+	WELL_KNOWN: 1,
+	MIME_MEDIA: 2,
+	ABSOLUTE_URI: 3,
+	EXTERNAL_TYPE: 4,
+	UNKNOWN: 5,
+	UNCHANGED: 6,
+	RESERVED: 7,
+});
+
+/**
  * @param {NDEFMessage} message
  * @returns {Uint8Array}
  */
