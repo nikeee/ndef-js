@@ -44,6 +44,11 @@ describe("NDEF URI Encoder", () => {
 	});
 });
 
+/**
+ * @param {number} prefix
+ * @param {string} string
+ * @returns {number[]}
+ */
 function getBytes(prefix, string) {
 	const bytes = util.stringToBytes(string);
 	bytes.unshift(prefix);

@@ -43,8 +43,12 @@ const protocols = [
 	"urn:nfc:",
 ];
 
-// decode a URI payload bytes
-// @returns a string
+/**
+ * decode a URI payload bytes
+ *
+ * @param {number[]} data
+ * @returns {string}
+ */
 export function decodePayload(data) {
 	let prefix = protocols[data[0]];
 	if (!prefix) {
@@ -54,8 +58,11 @@ export function decodePayload(data) {
 	return prefix + util.bytesToString(data.slice(1));
 }
 
-// shorten a URI with standard prefix
-// @returns an array of bytes
+/**
+ * shorten a URI with standard prefix
+ * @param {string} uri
+ * @returns {number[]}
+ */
 export function encodePayload(uri) {
 	let prefix;
 	let protocolCode;
