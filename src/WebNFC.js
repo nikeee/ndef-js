@@ -82,3 +82,19 @@ export function createNdefMessage(message) {
 export function createNdefRecord(record) {
 	throw new Error("Not implemented");
 }
+
+/**
+ * @param {NDEFMessage} message
+ * @returns {Uint8Array}
+ */
+export function encodeNdefMessage(message) {
+	throw new Error("Not implemented");
+}
+
+/**
+ * @param {BufferSource} message
+ * @returns {NDEFMessage}
+ */
+export function decodeNdefMessage(message) {
+	throw new Error("Not implemented");
+}
