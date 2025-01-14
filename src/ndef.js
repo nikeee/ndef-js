@@ -172,36 +172,24 @@ const ndef = {
 	/**
 	 * Creates a JSON representation of a NDEF Record.
 	 *
-	 * @param {number} tnf 3-bit TNF (Type Name Format) - use one of the TNF.* constants
-	 * @param {number[] | string} type byte array, containing zero to 255 bytes, must not be null
-	 * @param {number[]} id byte array, containing zero to 255 bytes, must not be null
-	 * @param {number[]} payload byte array, containing zero to (2 ** 32 - 1) bytes, must not be null
+	 * @param {number} [tnf] 3-bit TNF (Type Name Format) - use one of the TNF.* constants
+	 * @param {number[] | string} [type] byte array, containing zero to 255 bytes, must not be null
+	 * @param {number[]} [id] byte array, containing zero to 255 bytes, must not be null
+	 * @param {number[]} [payload] byte array, containing zero to (2 ** 32 - 1) bytes, must not be null
 	 *
 	 * @returns JSON representation of a NDEF record
 	 *
 	 * @see Ndef.textRecord, Ndef.uriRecord and Ndef.mimeMediaRecord for examples
 	 */
 	record: (tnf = TNF.EMPTY, type = [], id = [], payload = []) => {
-		// store type as String so it's easier to compare
-		if (Array.isArray(type)) {
-			type = util.bytesToString(type);
-		}
-
-		// in the future, id could be a String
-		if (!Array.isArray(id)) {
-			id = util.stringToBytes(id);
-		}
-
-		// Payload must be binary
-		if (!Array.isArray(payload)) {
-			payload = util.stringToBytes(payload);
-		}
-
 		const record = {
-			tnf: tnf,
-			type: type,
-			id: id,
-			payload: payload,
+			tnf,
+			// store type as String so it's easier to compare
+			type: Array.isArray(type) ? util.bytesToString(type) : type,
+			// in the future, id could be a String
+			id: Array.isArray(id) ? id : util.stringToBytes(id),
+			payload: Array.isArray(payload) ? payload : util.stringToBytes(payload),
+			value: undefined,
 		};
 
 		// Experimental feature
