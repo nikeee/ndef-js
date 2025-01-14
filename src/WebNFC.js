@@ -188,6 +188,68 @@ const TNF = /* @__PURE__ */ Object.freeze({
  * @returns {Uint8Array}
  */
 export function encodeNdefMessage(message) {
+	const recordCount = message.records.length;
+	const _encodedRecords = message.records.map((r, i) =>
+		encodeNdefRecord(r, i, recordCount),
+	);
+
+	throw new Error("Not implemented");
+}
+
+/**
+ * @param {NDEFRecord} record
+ * @param {number} recordIndex
+ * @param {number} recordCount
+ */
+function encodeNdefRecord(record, recordIndex, recordCount) {
+	// https://w3c.github.io/web-nfc/#the-ndef-record-and-fields
+
+	const id =
+		"id" in record && record.id !== undefined && record.id !== null
+			? record.id
+			: undefined;
+
+	const header = {
+		mb: recordIndex === 0,
+		me: recordIndex === recordCount - 1,
+		cf: false,
+		sr: false,
+		il: id !== undefined,
+		tnf: 0,
+	};
+
+	switch (record.recordType) {
+		case "empty": {
+			header.tnf = TNF.EMPTY;
+			break;
+		}
+
+		default:
+			throw new Error("Unsupported recordType");
+	}
+
+	const headerByte =
+		(header.mb ? 0b10000_000 : 0) |
+		(header.me ? 0b01000_000 : 0) |
+		(header.cf ? 0b00100_000 : 0) |
+		(header.sr ? 0b00010_000 : 0) |
+		(header.il ? 0b00001_000 : 0) |
+		header.tnf;
+
+	const typeLength = 0; // TODO
+	const payloadLength = 0; // TODO
+	const idLength = 0; // TODO
+
+	const buffer = [headerByte, typeLength, payloadLength];
+
+	if (id !== undefined) {
+		buffer.push(idLength);
+	}
+
+	if (typeLength > 0) {
+		throw new Error("Not implemented");
+	}
+
 	throw new Error("Not implemented");
 }
 
