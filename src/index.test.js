@@ -200,18 +200,21 @@ describe("decodeMessage", () => {
 		assert.equal(ndef.RTD.TEXT, decodedMessage[0].type);
 		assert.equal(
 			"hello, world",
-			new Buffer(decodedMessage[0].payload).slice(3),
+			Buffer.from(decodedMessage[0].payload).subarray(3),
 		);
 
 		assert.equal(ndef.TNF.WELL_KNOWN, decodedMessage[1].tnf);
 		assert.equal(ndef.RTD.URI, decodedMessage[1].type);
-		assert.equal("nodejs.org", new Buffer(decodedMessage[1].payload).slice(1)); // char 0 is 0x3 for http://
+		assert.equal(
+			"nodejs.org",
+			Buffer.from(decodedMessage[1].payload).subarray(1),
+		); // char 0 is 0x3 for http://
 
 		assert.equal(ndef.TNF.MIME_MEDIA, decodedMessage[2].tnf);
-		assert.equal("text/json", new Buffer(decodedMessage[2].type));
+		assert.equal("text/json", Buffer.from(decodedMessage[2].type));
 		assert.equal(
 			'{"message": "hello, world"}',
-			new Buffer(decodedMessage[2].payload),
+			Buffer.from(decodedMessage[2].payload),
 		);
 	});
 });
