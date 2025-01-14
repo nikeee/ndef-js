@@ -17,8 +17,12 @@ const TLV_START = BLOCK_SIZE * 4;
 // NDEF Type and Length are 4 bytes
 const TL_LENGTH = 4;
 
+/**
+ * @param {Buffer} rawTagData
+ * @returns {number}
+ */
 function getNdefLength(rawTagData) {
-	const b = rawTagData.slice(TLV_START, TLV_START + TL_LENGTH);
+	const b = rawTagData.subarray(TLV_START, TLV_START + TL_LENGTH);
 	let length = -1;
 
 	// 2 ways to encode length
@@ -37,8 +41,13 @@ function getNdefLength(rawTagData) {
 	return length;
 }
 
-// The first 32 sectors contain 4 blocks and the last 8 sectors contain 16 blocks.
-// The tailing block of each sector contains
+/**
+ * The first 32 sectors contain 4 blocks and the last 8 sectors contain 16 blocks.
+ * The tailing block of each sector contains.
+ *
+ * @param {number} blockNumber
+ * @returns {boolean}
+ */
 function isTrailingBlock(blockNumber) {
 	if (blockNumber < 32 * 4) {
 		return (blockNumber + 1) % 4 === 0;
@@ -46,9 +55,13 @@ function isTrailingBlock(blockNumber) {
 	return (blockNumber + 1) % 16 === 0;
 }
 
+/**
+ * @param {Buffer} rawTagData
+ * @returns {Buffer}
+ */
 export function getNdefData(rawTagData) {
 	const messageLength = getNdefLength(rawTagData);
-	const buffer = new Buffer(rawTagData.length); // could be messageLength + BLOCK_SIZE * 4
+	const buffer = Buffer.alloc(rawTagData.length); // could be messageLength + BLOCK_SIZE * 4
 	let sourceStart = 0;
 	let targetStart = 0;
 	let messageEnd;
@@ -83,5 +96,5 @@ export function getNdefData(rawTagData) {
 		);
 	}
 
-	return buffer.slice(messageStart, messageEnd);
+	return buffer.subarray(messageStart, messageEnd);
 }

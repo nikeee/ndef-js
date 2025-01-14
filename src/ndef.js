@@ -411,6 +411,12 @@ function tnfToString(tnf) {
 // a custom implementation. It would be nice to make
 // smarter record objects that can print themselves
 const stringifier = {
+	/**
+	 *
+	 * @param {any[]} data
+	 * @param {string} separator
+	 * @returns {string}
+	 */
 	stringify: (data, separator) => {
 		if (Array.isArray(data)) {
 			if (typeof data[0] === "number") {
@@ -423,10 +429,12 @@ const stringifier = {
 		return stringifier.printRecord(data, separator);
 	},
 
-	// @message - NDEF Message (array of NDEF Records)
-	// @separator - line separator, optional, defaults to \n
-	// @returns string with NDEF Message
-	printRecords: (message, separator = "\n") => {
+	/**
+	 * @param {{ tnf: any; type: any; payload: number[]; }[]} message NDEF Message (array of NDEF Records)
+	 * @param {string} separator line separator, optional, defaults to \n
+	 * @returns {string} string with NDEF Message
+	 */
+	printRecords: (/** @type {any} */ message, separator = "\n") => {
 		let result = "";
 		// Print out the payload for each record
 		for (const record of message) {
@@ -437,9 +445,11 @@ const stringifier = {
 		return result.slice(0, -1 * separator.length);
 	},
 
-	// @record - NDEF Record
-	// @separator - line separator, optional, defaults to \n
-	// @returns string with NDEF Record
+	/**
+	 * @param {{ tnf: any; type: any; payload: number[]; }} record NDEF Record
+	 * @param {string | undefined} separator line separator, optional, defaults to \n
+	 * @returns {string} string with NDEF Record
+	 */
 	printRecord: (record, separator = "\n") => {
 		let result = "";
 
@@ -482,6 +492,11 @@ const stringifier = {
 		return result;
 	},
 
+	/**
+	 * @param {{ tnf: any; type: any; payload: number[]; }} record
+	 * @param {string} separator
+	 * @returns {string}
+	 */
 	printWellKnown: (record, separator) => {
 		let result = "";
 
