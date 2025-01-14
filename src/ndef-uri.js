@@ -65,24 +65,19 @@ export function decodePayload(data) {
  */
 export function encodePayload(uri) {
 	let prefix;
-	let protocolCode;
-	let encoded;
-
 	// check each protocol, unless we've found a match
 	// "urn:" is the one exception where we need to keep checking
 	// slice so we don't check ""
-	protocols.slice(1).forEach((protocol) => {
+	for (const protocol of protocols.slice(1)) {
 		if ((!prefix || prefix === "urn:") && uri.indexOf(protocol) === 0) {
 			prefix = protocol;
 		}
-	});
-
-	if (!prefix) {
-		prefix = "";
 	}
 
-	encoded = util.stringToBytes(uri.slice(prefix.length));
-	protocolCode = protocols.indexOf(prefix);
+	prefix ??= "";
+
+	const encoded = util.stringToBytes(uri.slice(prefix.length));
+	const protocolCode = protocols.indexOf(prefix);
 	// prepend protocol code
 	encoded.unshift(protocolCode);
 
