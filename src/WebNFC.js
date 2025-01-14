@@ -62,13 +62,15 @@
  *   records: NDEFRecordInit[];
  * }} NDEFMessageInit
  *
+ * @typedef {string | BufferSource | NDEFMessageInit} NDEFRecordDataSource
+ *
  * @typedef {{
- *  recordType: string;
- *  mediaType?: string;
- *  data?: string | BufferSource;
- *  lang?: string;
- *  encoding?: string;
- *  id?: string;
+ *   recordType: string
+ *   mediaType?: string
+ *   id?: string
+ *   encoding?: string
+ *   lang?: string
+ *   data?: NDEFRecordDataSource
  * }} NDEFRecordInit // TODO
  */
 
