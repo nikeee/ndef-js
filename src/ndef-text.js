@@ -2,8 +2,12 @@
 
 import * as util from "./ndef-util.js";
 
-// decode text bytes from ndef record payload
-// @returns a string
+/**
+ * decode text bytes from ndef record payload
+ *
+ * @param {number[]} data
+ * @returns {string}
+ */
 export function decodePayload(data) {
 	const languageCodeLength = data[0] & 0x3f; // 6 LSBs
 	const languageCode = data.slice(1, 1 + languageCodeLength);
@@ -15,16 +19,15 @@ export function decodePayload(data) {
 	return util.bytesToString(data.slice(languageCodeLength + 1));
 }
 
-// encode text payload
-// @returns an array of bytes
-export function encodePayload(text, lang, encoding) {
-	// ISO/IANA language code, but we're not enforcing
-	if (!lang) {
-		lang = "en";
-	}
-
-	const encoded = util.stringToBytes(lang + text);
-	encoded.unshift(lang.length);
-
+/**
+ * encode text payload
+ *
+ * @param {string} text
+ * @param {string} language ISO/IANA language code. But it's not enforced.
+ * @returns {number[]}
+ */
+export function encodePayload(text, language = "en") {
+	const encoded = util.stringToBytes(language + text);
+	encoded.unshift(language.length);
 	return encoded;
 }
