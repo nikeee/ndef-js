@@ -276,7 +276,8 @@ function createNdefRecordInner(record, context, recordsDepth) {
 			let encoding;
 			if (typeof data === "string") {
 				if (
-					(record.encoding !== null && record.encoding !== undefined) ||
+					record.encoding !== null &&
+					record.encoding !== undefined &&
 					record.encoding !== "utf-8"
 				) {
 					throw new TypeError(
