@@ -66,13 +66,65 @@
  */
 
 /**
- * @param {NDEFMessageInit} message
+ * @param {NDEFMessageInit | string | BufferSource} message
  * @returns {NDEFMessage}
  */
 export function createNdefMessage(message) {
-	return {
-		records: message.records.map(createNdefRecord),
-	};
+	const res = createNdefMessageInner(message, "", 0);
+	// TODO: Check created records
+	return res;
+}
+
+/**
+ * @param {NDEFMessageInit | string | BufferSource} source
+ * @param {string} context
+ * @param {number} recordsDepth
+ * @returns {NDEFMessage}
+ */
+function createNdefMessageInner(source, context, recordsDepth) {
+	// See:
+	// https://w3c.github.io/web-nfc/#creating-ndef-message
+	switch (typeof source) {
+		case "string":
+			return {
+				records: [
+					createNdefRecord({
+						recordType: "text",
+						lang: "en",
+						data: new TextEncoder().encode(source).buffer,
+					}),
+				],
+			};
+		default: {
+			if ("records" in source && Array.isArray(source.records)) {
+				if (source.records.length === 0) {
+					throw new TypeError("The given message is empty");
+				}
+				const newRecordsDepth = recordsDepth + 1;
+				if (newRecordsDepth > 32) {
+					throw new TypeError("The given message is too deeply nested");
+				}
+
+				return {
+					records: source.records.map((r) =>
+						createNdefRecordInner(r, context, newRecordsDepth),
+					),
+				};
+			}
+
+			return {
+				records: [
+					createNdefRecord({
+						recordType: "mime",
+						mediaType: "application/octet-stream",
+						data: source,
+					}),
+				],
+			};
+			// TODO:
+			// throw new TypeError("Unable to process the given message");
+		}
+	}
 }
 
 /**
@@ -80,6 +132,16 @@ export function createNdefMessage(message) {
  * @returns {NDEFRecord}
  */
 export function createNdefRecord(record) {
+	return createNdefRecordInner(record, "", 0);
+}
+
+/**
+ * @param {NDEFRecordInit} record
+ * @param {string} context
+ * @param {number} recordsDepth
+ * @returns {NDEFRecord}
+ */
+function createNdefRecordInner(record, context, recordsDepth) {
 	throw new Error("Not implemented");
 }
 
