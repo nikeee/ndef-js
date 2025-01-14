@@ -3,7 +3,7 @@
 import * as assert from "node:assert";
 import { describe, it } from "node:test";
 
-import * as textHelper from "./ndef-text.js";
+import * as textHelper from "./text.js";
 
 describe("NDEF Text Encoder", () => {
 	it("should encode text with default lang", () => {

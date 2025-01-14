@@ -2,8 +2,8 @@
 
 // This code is based on phonegap-nfc.js https://github.com/don/phonegap-nfc
 
-import * as textHelper from "./ndef-text.js";
-import * as uriHelper from "./ndef-uri.js";
+import * as textHelper from "./text.js";
+import * as uriHelper from "./uri.js";
 import * as util from "./util.js";
 
 /**
