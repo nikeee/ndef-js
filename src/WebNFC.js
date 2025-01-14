@@ -113,7 +113,7 @@ function createNdefMessageInner(source, context, recordsDepth) {
 		};
 	}
 
-	if (source instanceof ArrayBuffer || ArrayBuffer.isView(source)) {
+	if (isBufferSource(source)) {
 		return {
 			records: [
 				createNdefRecord({
@@ -160,4 +160,12 @@ export function encodeNdefMessage(message) {
  */
 export function decodeNdefMessage(message) {
 	throw new Error("Not implemented");
+}
+
+/**
+ * @param {unknown} value
+ * @returns {value is BufferSource}
+ */
+function isBufferSource(value) {
+	return value instanceof ArrayBuffer || ArrayBuffer.isView(value);
 }
