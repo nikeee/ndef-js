@@ -31,7 +31,7 @@
  *   lang: null;
  *   encoding: null;
  *   mediaType: null;
- *   data: null | DataView;
+ *   data: DataView;
  * }} UrlNDEFRecord
  *
  * @typedef {{
@@ -341,6 +341,8 @@ function createNdefRecordInner(record, context, recordsDepth) {
 				throw new SyntaxError("Invalid URL");
 			}
 
+			// TODO: this puts a / at the end of the url if it's missing
+			// Check ifthis is spec-compliant
 			const serializedUrl = parsedUrl.toString();
 
 			return {
@@ -475,10 +477,21 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 
 			break;
 		}
-		case "url":
+		case "url": {
 			tnf = TNF.WELL_KNOWN;
 			type = new Uint8Array([0x55]); // "U"
+
+			const serializedUrl = textDecoder.decode(record.data.buffer);
+			const [prefixNumber, prefix] = findLongestPrefix(
+				serializedUrl,
+				urlPrefixes,
+			);
+
+			const serializedUrlWithoutPrefix =
+				prefix.length > 0 ? serializedUrl.slice(prefix.length) : prefix;
+
 			break;
+		}
 		case "mime":
 			tnf = TNF.MIME_MEDIA;
 			type = new Uint8Array(0); // TODO: Serialize mime type: https://mimesniff.spec.whatwg.org/#serialize-a-mime-type
@@ -496,14 +509,7 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 
 	// URL:
 	/*
-		const [prefixNumber, prefix] = findLongestPrefix(
-			serializedUrl,
-			urlPrefixes,
-		);
-
-		const serializedUrlWithoutPrefix =
-			prefix.length > 0 ? serializedUrl.slice(prefix.length) : prefix;
-	*/
+	 */
 
 	const header = {
 		mb: recordIndex === 0,
