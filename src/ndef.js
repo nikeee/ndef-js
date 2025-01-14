@@ -30,15 +30,150 @@ const RTD = /* @__PURE__ */ {
 	HANDOVER_SELECT: "Hs", // [0x48, 0x73]
 };
 
+/**
+ * Convert NDEF records and messages to strings
+ * This works OK for demos, but real code proably needs
+ * a custom implementation. It would be nice to make
+ * smarter record objects that can print themselves
+ */
+const stringifier = {
+	/**
+	 *
+	 * @param {any[]} data
+	 * @param {string} separator
+	 * @returns {string}
+	 */
+	stringify: (data, separator) => {
+		if (Array.isArray(data)) {
+			if (typeof data[0] === "number") {
+				// guessing this message bytes
+				data = ndef.decodeMessage(data);
+			}
+
+			return stringifier.printRecords(data, separator);
+		}
+		return stringifier.printRecord(data, separator);
+	},
+
+	/**
+	 * @param {{ tnf: any; type: any; payload: number[]; }[]} message NDEF Message (array of NDEF Records)
+	 * @param {string} separator line separator, optional, defaults to \n
+	 * @returns {string} string with NDEF Message
+	 */
+	printRecords: (/** @type {any} */ message, separator = "\n") => {
+		let result = "";
+		// Print out the payload for each record
+		for (const record of message) {
+			result += stringifier.printRecord(record, separator);
+			result += separator;
+		}
+
+		return result.slice(0, -1 * separator.length);
+	},
+
+	/**
+	 * @param {{ tnf: any; type: any; payload: number[]; }} record NDEF Record
+	 * @param {string | undefined} separator line separator, optional, defaults to \n
+	 * @returns {string} string with NDEF Record
+	 */
+	printRecord: (record, separator = "\n") => {
+		let result = "";
+
+		switch (record.tnf) {
+			case TNF.EMPTY:
+				result += "Empty Record";
+				result += separator;
+				break;
+			case TNF.WELL_KNOWN:
+				result += stringifier.printWellKnown(record, separator);
+				break;
+			case TNF.MIME_MEDIA:
+				result += "MIME Media";
+				result += separator;
+				result += s(record.type);
+				result += separator;
+				result += s(record.payload); // might be binary
+				break;
+			case TNF.ABSOLUTE_URI:
+				result += "Absolute URI";
+				result += separator;
+				result += s(record.type); // the URI is the type
+				result += separator;
+				result += s(record.payload); // might be binary
+				break;
+			case TNF.EXTERNAL_TYPE:
+				// AAR contains strings, other types could
+				// contain binary data
+				result += "External";
+				result += separator;
+				result += s(record.type);
+				result += separator;
+				result += s(record.payload);
+				break;
+			default:
+				result += s(`Can't process TNF ${record.tnf}`);
+		}
+
+		result += separator;
+		return result;
+	},
+
+	/**
+	 * @param {{ tnf: any; type: any; payload: number[]; }} record
+	 * @param {string} separator
+	 * @returns {string}
+	 */
+	printWellKnown: (record, separator) => {
+		let result = "";
+
+		if (record.tnf !== TNF.WELL_KNOWN) {
+			return "ERROR expecting TNF Well Known";
+		}
+
+		switch (record.type) {
+			case RTD.TEXT:
+				result += "Text Record";
+				result += separator;
+				result += ndef.text.decodePayload(record.payload);
+				break;
+			case RTD.URI:
+				result += "URI Record";
+				result += separator;
+				result += ndef.uri.decodePayload(record.payload);
+				break;
+			case RTD.SMART_POSTER:
+				result += "Smart Poster";
+				result += separator;
+				// the payload of a smartposter is a NDEF message
+				result += stringifier.printRecords(ndef.decodeMessage(record.payload));
+				break;
+			default:
+				// attempt to display other types
+				result += `${record.type} Record`;
+				result += separator;
+				result += s(record.payload);
+		}
+
+		return result;
+	},
+};
+
 const ndef = {
 	TNF,
 	RTD,
+
+	// expose helper objects
+	text: textHelper,
+	uri: uriHelper,
+	tnfToString,
+	util,
+	stringify: stringifier.stringify,
 
 	/**
 	 * Creates a JSON representation of a NDEF Record.
 	 *
 	 * @param {number} tnf 3-bit TNF (Type Name Format) - use one of the TNF.* constants
-	 * @param {number[]} type byte array, containing zero to 255 bytes, must not be null
+	 * @param {number[] | string} type byte array, containing zero to 255 bytes, must not be null
 	 * @param {number[]} id byte array, containing zero to 255 bytes, must not be null
 	 * @param {number[]} payload byte array, containing zero to (2 ** 32 - 1) bytes, must not be null
 	 *
@@ -46,7 +181,7 @@ const ndef = {
 	 *
 	 * @see Ndef.textRecord, Ndef.uriRecord and Ndef.mimeMediaRecord for examples
 	 */
-	record: (tnf = ndef.TNF.EMPTY, type = [], id = [], payload = []) => {
+	record: (tnf = TNF.EMPTY, type = [], id = [], payload = []) => {
 		// store type as String so it's easier to compare
 		if (Array.isArray(type)) {
 			type = util.bytesToString(type);
@@ -73,10 +208,10 @@ const ndef = {
 		// Convert payload to text for Text and URI records
 		if (tnf === ndef.TNF.WELL_KNOWN) {
 			switch (record.type) {
-				case ndef.RTD.TEXT:
+				case RTD.TEXT:
 					record.value = ndef.text.decodePayload(record.payload);
 					break;
-				case ndef.RTD.URI:
+				case RTD.URI:
 					record.value = ndef.uri.decodePayload(record.payload);
 					break;
 			}
@@ -90,22 +225,22 @@ const ndef = {
 	 *
 	 * @param {string} text String of text to encode
 	 * @param {string} languageCode ISO/IANA language code. Examples: “fi”, “en-US”, “fr-CA”, “jp”. (optional)
-	 * @param {number[] | undefined | null} id
+	 * @param {number[] | undefined} id
 	 */
 	textRecord: (text, languageCode, id = []) => {
 		const payload = textHelper.encodePayload(text, languageCode);
-		return ndef.record(ndef.TNF.WELL_KNOWN, ndef.RTD.TEXT, id, payload);
+		return ndef.record(ndef.TNF.WELL_KNOWN, RTD.TEXT, id, payload);
 	},
 
 	/**
 	 * Helper that creates a NDEF record containing a URI.
 	 *
 	 * @param {string} uri
-	 * @param {number[] | undefined | null} id
+	 * @param {number[] | undefined} id
 	 */
 	uriRecord: (uri, id = []) => {
 		const payload = uriHelper.encodePayload(uri);
-		return ndef.record(ndef.TNF.WELL_KNOWN, ndef.RTD.URI, id, payload);
+		return ndef.record(ndef.TNF.WELL_KNOWN, RTD.URI, id, payload);
 	},
 
 	/**
@@ -129,7 +264,7 @@ const ndef = {
 	 *
 	 * @param {string} uri
 	 * @param {number[]} payload
-	 * @param {number[] | undefined | null} id
+	 * @param {number[] | undefined} id
 	 */
 	absoluteUriRecord: (uri, payload = [], id = []) => {
 		return ndef.record(ndef.TNF.ABSOLUTE_URI, uri, id, payload);
@@ -140,7 +275,7 @@ const ndef = {
 	 *
 	 * @param {string} mimeType
 	 * @param {number[]} payload
-	 * @param {number[] | undefined | undefined} id
+	 * @param {number[] | undefined} id
 	 */
 	mimeMediaRecord: (mimeType, payload, id = []) => {
 		return ndef.record(ndef.TNF.MIME_MEDIA, mimeType, id, payload);
@@ -150,7 +285,7 @@ const ndef = {
 	 * Helper that creates an NDEF record containing an Smart Poster.
 	 *
 	 * @param {object[]} ndefRecords array of NDEF Records
-	 * @param {number[] | undefined | undefined} id
+	 * @param {number[] | undefined} id
 	 */
 	smartPoster: (ndefRecords, id = []) => {
 		let payload = [];
@@ -170,7 +305,7 @@ const ndef = {
 			console.log("WARNING: Expecting an array of NDEF records");
 		}
 
-		return ndef.record(ndef.TNF.WELL_KNOWN, ndef.RTD.SMART_POSTER, id, payload);
+		return ndef.record(ndef.TNF.WELL_KNOWN, RTD.SMART_POSTER, id, payload);
 	},
 
 	/**
@@ -411,132 +546,6 @@ function tnfToString(tnf) {
 	}
 }
 
-// Convert NDEF records and messages to strings
-// This works OK for demos, but real code proably needs
-// a custom implementation. It would be nice to make
-// smarter record objects that can print themselves
-const stringifier = {
-	/**
-	 *
-	 * @param {any[]} data
-	 * @param {string} separator
-	 * @returns {string}
-	 */
-	stringify: (data, separator) => {
-		if (Array.isArray(data)) {
-			if (typeof data[0] === "number") {
-				// guessing this message bytes
-				data = ndef.decodeMessage(data);
-			}
-
-			return stringifier.printRecords(data, separator);
-		}
-		return stringifier.printRecord(data, separator);
-	},
-
-	/**
-	 * @param {{ tnf: any; type: any; payload: number[]; }[]} message NDEF Message (array of NDEF Records)
-	 * @param {string} separator line separator, optional, defaults to \n
-	 * @returns {string} string with NDEF Message
-	 */
-	printRecords: (/** @type {any} */ message, separator = "\n") => {
-		let result = "";
-		// Print out the payload for each record
-		for (const record of message) {
-			result += stringifier.printRecord(record, separator);
-			result += separator;
-		}
-
-		return result.slice(0, -1 * separator.length);
-	},
-
-	/**
-	 * @param {{ tnf: any; type: any; payload: number[]; }} record NDEF Record
-	 * @param {string | undefined} separator line separator, optional, defaults to \n
-	 * @returns {string} string with NDEF Record
-	 */
-	printRecord: (record, separator = "\n") => {
-		let result = "";
-
-		switch (record.tnf) {
-			case ndef.TNF.EMPTY:
-				result += "Empty Record";
-				result += separator;
-				break;
-			case ndef.TNF.WELL_KNOWN:
-				result += stringifier.printWellKnown(record, separator);
-				break;
-			case ndef.TNF.MIME_MEDIA:
-				result += "MIME Media";
-				result += separator;
-				result += s(record.type);
-				result += separator;
-				result += s(record.payload); // might be binary
-				break;
-			case ndef.TNF.ABSOLUTE_URI:
-				result += "Absolute URI";
-				result += separator;
-				result += s(record.type); // the URI is the type
-				result += separator;
-				result += s(record.payload); // might be binary
-				break;
-			case ndef.TNF.EXTERNAL_TYPE:
-				// AAR contains strings, other types could
-				// contain binary data
-				result += "External";
-				result += separator;
-				result += s(record.type);
-				result += separator;
-				result += s(record.payload);
-				break;
-			default:
-				result += s(`Can't process TNF ${record.tnf}`);
-		}
-
-		result += separator;
-		return result;
-	},
-
-	/**
-	 * @param {{ tnf: any; type: any; payload: number[]; }} record
-	 * @param {string} separator
-	 * @returns {string}
-	 */
-	printWellKnown: (record, separator) => {
-		let result = "";
-
-		if (record.tnf !== ndef.TNF.WELL_KNOWN) {
-			return "ERROR expecting TNF Well Known";
-		}
-
-		switch (record.type) {
-			case ndef.RTD.TEXT:
-				result += "Text Record";
-				result += separator;
-				result += ndef.text.decodePayload(record.payload);
-				break;
-			case ndef.RTD.URI:
-				result += "URI Record";
-				result += separator;
-				result += ndef.uri.decodePayload(record.payload);
-				break;
-			case ndef.RTD.SMART_POSTER:
-				result += "Smart Poster";
-				result += separator;
-				// the payload of a smartposter is a NDEF message
-				result += stringifier.printRecords(ndef.decodeMessage(record.payload));
-				break;
-			default:
-				// attempt to display other types
-				result += `${record.type} Record`;
-				result += separator;
-				result += s(record.payload);
-		}
-
-		return result;
-	},
-};
-
 /**
  * @param {number[]} bytes
  * @returns {string}
@@ -544,12 +553,5 @@ const stringifier = {
 function s(bytes) {
 	return Buffer.from(bytes).toString();
 }
-
-// expose helper objects
-ndef.text = textHelper;
-ndef.uri = uriHelper;
-ndef.tnfToString = tnfToString;
-ndef.util = util;
-ndef.stringify = stringifier.stringify;
 
 export default ndef;
