@@ -8,11 +8,6 @@
 
 /**
  * @typedef {{
- *   id: string | null;
- *   lang: null | string;
- * }} NDEFRecordBase
- *
- * @typedef {{
  *   recordType: "empty";
  *   id: null;
  *   lang: null;
@@ -23,32 +18,43 @@
  *
  * @typedef {{
  *   recordType: "text";
+ *   id: string | null;
+ *   lang: string;
+ *   encoding: "utf-8";
  *   mediaType: null;
  *   data: null | DataView;
- *   lang: string;
  * }} TextNDEFRecord
  *
  * @typedef {{
  *   recordType: "url";
- *   mediaType: null;
- *   data: null | DataView;
+ *   id: string | null;
  *   lang: null;
  *   encoding: null;
+ *   mediaType: null;
+ *   data: null | DataView;
  * }} UrlNDEFRecord
  *
  * @typedef {{
  *   recordType: "smart-poster";
+ *   id: string | null;
+ *   lang: null;
+ *   encoding: null;
  *   mediaType: null;
  *   data: null | DataView;
  * }} SmartPosterNDEFRecord
  *
  * @typedef {{
  *   recordType: "mime";
+ *   id: string | null;
+ *   lang: null;
+ *   encoding: null;
  *   mediaType: string;
+ *   data: DataView;
  * }} MimeNDEFRecord
  *
  * @typedef {{
  *   recordType: "unknown";
+ *   id: string | null;
  *   mediaType: null;
  * }} UnknownNDEFRecord
  *
@@ -73,6 +79,9 @@
  *   data?: NDEFRecordDataSource
  * }} NDEFRecordInit // TODO
  */
+
+const textEncoder = new TextEncoder();
+const textDecoder = new TextDecoder();
 
 /**
  * @param {NDEFMessageInit | string | BufferSource} message
@@ -164,7 +173,118 @@ export function createNdefRecord(record) {
  * @returns {NDEFRecord}
  */
 function createNdefRecordInner(record, context, recordsDepth) {
-	throw new Error("Not implemented");
+	switch (record.recordType) {
+		case "empty": {
+			if (record.lang !== null && record.lang !== undefined) {
+				throw new TypeError("The lang attribute must be null for empty record");
+			}
+			if (record.mediaType !== null && record.mediaType !== undefined) {
+				throw new TypeError(
+					"The mediaType attribute must be null for empty record",
+				);
+			}
+
+			return {
+				recordType: "empty",
+				id: null,
+				lang: null,
+				encoding: null,
+				mediaType: null,
+				data: null,
+			};
+		}
+		case "text": {
+			if (record.mediaType !== null && record.mediaType !== undefined) {
+				throw new TypeError(
+					"The mediaType attribute must be null for text record",
+				);
+			}
+
+			const data = record.data;
+			if (!data || (typeof data !== "string" && !isBufferSource(data))) {
+				throw new TypeError(
+					"The data attribute must be a string or BufferSource for text record",
+				);
+			}
+
+			let encoding;
+			if (typeof data === "string") {
+				if (
+					(record.encoding !== null && record.encoding !== undefined) ||
+					record.encoding !== "utf-8"
+				) {
+					throw new TypeError(
+						"The encoding attribute must be null or 'utf-8' for text record",
+					);
+				}
+
+				encoding = "utf-8";
+			} else {
+				encoding = record.encoding ?? "utf-8";
+				if (
+					encoding !== "utf-8" &&
+					encoding !== "utf-16" &&
+					encoding !== "utf-16be" &&
+					encoding !== "utf-16le"
+				) {
+					throw new TypeError("Unsupported encoding");
+				}
+			}
+
+			if (encoding !== "utf-8") {
+				// Maybe we should support other encodings
+				// The checks above are there to adhere the standard,
+				// while we ultimately do not support other encodings
+				throw new TypeError("Encoding not supported by this library");
+			}
+
+			const lang = record.lang ?? "en";
+			if (lang.length > 63) {
+				throw new TypeError("The lang attribute must be at most 63 characters");
+			}
+
+			return {
+				recordType: "text",
+				id: record.id ?? null,
+				lang,
+				encoding,
+				mediaType: null,
+				data: new DataView(
+					typeof data === "string" ? textEncoder.encode(data) : data,
+				),
+			};
+		}
+
+		case "mime": {
+			const data = record.data;
+			if (!data || !isBufferSource(data)) {
+				throw new TypeError(
+					"The data attribute must be a BufferSource for mime record",
+				);
+			}
+
+			if (record.mediaType === undefined || record.mediaType === null) {
+				throw new TypeError(
+					"The mediaType attribute is required for mime record",
+				);
+			}
+
+			// TODO: parse media type:
+			// https://mimesniff.spec.whatwg.org/#parse-a-mime-type
+
+			return {
+				recordType: "mime",
+				id: record.id ?? null,
+				lang: null,
+				encoding: null,
+				mediaType: record.mediaType,
+				data: new DataView(data),
+			};
+		}
+
+		default:
+			throw new TypeError("Unsupported recordType");
+	}
 }
 
 /**
@@ -218,9 +338,17 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 		tnf: 0,
 	};
 
+	let type = null;
+
 	switch (record.recordType) {
 		case "empty": {
 			header.tnf = TNF.EMPTY;
+			type = new Uint8Array(0);
+			break;
+		}
+		case "text": {
+			header.tnf = TNF.WELL_KNOWN;
+			type = new Uint8Array([0x54]); // "T"
 			break;
 		}
 
@@ -236,19 +364,15 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 		(header.il ? 0b00001_000 : 0) |
 		header.tnf;
 
-	const typeLength = 0; // TODO
-	const payloadLength = 0; // TODO
-	const idLength = 0; // TODO
-
-	const buffer = [headerByte, typeLength, payloadLength];
-
-	if (id !== undefined) {
-		buffer.push(idLength);
-	}
-
-	if (typeLength > 0) {
-		throw new Error("Not implemented");
-	}
+	/*
+		const header = (encoding !== "utf-8" ? 0b1_0_000000 : 0) |
+		(lang.length & 0b0_0_111111);
+		const payload = [
+			header,
+			...textEncoder.encode(lang),
+			...(typeof data === "string" ? textEncoder.encode(data) : data),
+		];
+		*/
 
 	throw new Error("Not implemented");
 }
