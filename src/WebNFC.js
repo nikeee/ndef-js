@@ -84,47 +84,48 @@ export function createNdefMessage(message) {
 function createNdefMessageInner(source, context, recordsDepth) {
 	// See:
 	// https://w3c.github.io/web-nfc/#creating-ndef-message
-	switch (typeof source) {
-		case "string":
-			return {
-				records: [
-					createNdefRecord({
-						recordType: "text",
-						lang: "en",
-						data: new TextEncoder().encode(source).buffer,
-					}),
-				],
-			};
-		default: {
-			if ("records" in source && Array.isArray(source.records)) {
-				if (source.records.length === 0) {
-					throw new TypeError("The given message is empty");
-				}
-				const newRecordsDepth = recordsDepth + 1;
-				if (newRecordsDepth > 32) {
-					throw new TypeError("The given message is too deeply nested");
-				}
-
-				return {
-					records: source.records.map((r) =>
-						createNdefRecordInner(r, context, newRecordsDepth),
-					),
-				};
-			}
-
-			return {
-				records: [
-					createNdefRecord({
-						recordType: "mime",
-						mediaType: "application/octet-stream",
-						data: source,
-					}),
-				],
-			};
-			// TODO:
-			// throw new TypeError("Unable to process the given message");
-		}
+	if (typeof source === "string") {
+		return {
+			records: [
+				createNdefRecord({
+					recordType: "text",
+					lang: "en",
+					data: new TextEncoder().encode(source).buffer,
+				}),
+			],
+		};
 	}
+
+	if ("records" in source && Array.isArray(source.records)) {
+		if (source.records.length === 0) {
+			throw new TypeError("The given message is empty");
+		}
+
+		const newRecordsDepth = recordsDepth + 1;
+		if (newRecordsDepth > 32) {
+			throw new TypeError("The given message is too deeply nested");
+		}
+
+		return {
+			records: source.records.map((r) =>
+				createNdefRecordInner(r, context, newRecordsDepth),
+			),
+		};
+	}
+
+	if (source instanceof ArrayBuffer || ArrayBuffer.isView(source)) {
+		return {
+			records: [
+				createNdefRecord({
+					recordType: "mime",
+					mediaType: "application/octet-stream",
+					data: source,
+				}),
+			],
+		};
+	}
+
+	throw new TypeError("Unable to process the given message");
 }
 
 /**
