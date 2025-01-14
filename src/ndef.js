@@ -47,6 +47,7 @@ const stringifier = {
 		if (Array.isArray(data)) {
 			if (typeof data[0] === "number") {
 				// guessing this message bytes
+				// biome-ignore lint/style/noParameterAssign: :shrug:
 				data = ndef.decodeMessage(data);
 			}
 
@@ -280,10 +281,7 @@ const ndef = {
 
 		if (ndefRecords) {
 			// make sure we have an array of something like NDEF records before encoding
-			if (
-				ndefRecords[0] instanceof Object &&
-				ndefRecords[0].hasOwnProperty("tnf")
-			) {
+			if (ndefRecords[0] instanceof Object && "tnf" in ndefRecords[0]) {
 				payload = ndef.encodeMessage(ndefRecords);
 			} else {
 				// assume the caller has already encoded the NDEF records into a byte array
