@@ -487,9 +487,13 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 				urlPrefixes,
 			);
 
-			const serializedUrlWithoutPrefix =
+			const shortenedUrl =
 				prefix.length > 0 ? serializedUrl.slice(prefix.length) : prefix;
 
+			payload = new Uint8Array([
+				prefixNumber,
+				...textEncoder.encode(shortenedUrl),
+			]);
 			break;
 		}
 		case "mime":

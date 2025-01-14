@@ -90,12 +90,13 @@ describe("should encode correctly", () => {
 				},
 			],
 		});
+
 		const encoded = ndef.encodeNdefMessage(message);
 		assert.deepEqual(
 			encoded,
 			new Uint8Array([
-				209, 1, 1, 85, 1, 104, 116, 116, 112, 58, 47, 47, 110, 111, 100, 101,
-				106, 115, 46, 111, 114, 103, 47,
+				209, 1, 0x0c, 85, 3, 110, 111, 100, 101, 106, 115, 46, 111, 114, 103,
+				0x2f,
 			]).buffer,
 		);
 	});
