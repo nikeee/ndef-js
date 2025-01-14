@@ -1,6 +1,6 @@
 // @ts-check
 
-import assert from "node:assert";
+import * as assert from "node:assert";
 import { describe, it } from "node:test";
 
 import * as util from "./ndef-util.js";
