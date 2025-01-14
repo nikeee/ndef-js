@@ -1,8 +1,10 @@
-const assert = require("node:assert");
-const { describe, it } = require("node:test");
+// @ts-check
 
-const uriHelper = require("./ndef-uri");
-const util = require("./ndef-util");
+import assert from "node:assert";
+import { describe, it } from "node:test";
+
+import * as uriHelper from "./ndef-uri.js";
+import * as util from "./ndef-util.js";
 
 describe("NDEF URI Encoder", () => {
 	it("should encode URIs", () => {

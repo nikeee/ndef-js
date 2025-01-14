@@ -1,2 +1,2 @@
-const ndef = require("./ndef");
-module.exports = ndef;
+// @ts-check
+export { default } from "./ndef.js";

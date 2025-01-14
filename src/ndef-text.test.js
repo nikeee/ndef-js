@@ -1,7 +1,9 @@
-const assert = require("node:assert");
-const { describe, it } = require("node:test");
+// @ts-check
 
-const textHelper = require("./ndef-text");
+import assert from "node:assert";
+import { describe, it } from "node:test";
+
+import * as textHelper from "./ndef-text.js";
 
 describe("NDEF Text Encoder", () => {
 	it("should encode text with default lang", () => {
@@ -52,7 +54,7 @@ describe("NDEF Text Decoder", () => {
 		const encoded = [
 			2, 101, 110, 104, 101, 108, 108, 111, 44, 32, 119, 111, 114, 108, 100,
 		];
-		decoded = textHelper.decodePayload(encoded);
+		const decoded = textHelper.decodePayload(encoded);
 		assert.equal("hello, world", decoded);
 	});
 
@@ -61,7 +63,7 @@ describe("NDEF Text Decoder", () => {
 		const encoded = [
 			130, 101, 110, 104, 101, 108, 108, 111, 44, 32, 119, 111, 114, 108, 100,
 		];
-		decoded = textHelper.decodePayload(encoded);
+		const decoded = textHelper.decodePayload(encoded);
 		assert.equal("hello, world", decoded);
 	});
 });

@@ -1,7 +1,9 @@
-const assert = require("node:assert");
-const { describe, it } = require("node:test");
+// @ts-check
 
-const util = require("./ndef-util");
+import assert from "node:assert";
+import { describe, it } from "node:test";
+
+import * as util from "./ndef-util.js";
 
 describe("UTF-8", () => {
 	it("should encode UTF-8", () => {

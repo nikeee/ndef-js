@@ -1,4 +1,6 @@
-const util = require("./ndef-util");
+// @ts-check
+
+import * as util from "./ndef-util.js";
 
 // URI identifier codes from URI Record Type Definition NFCForum-TS-RTD_URI_1.0 2006-07-24
 // index in array matches code in the spec
@@ -43,7 +45,7 @@ const protocols = [
 
 // decode a URI payload bytes
 // @returns a string
-function decode(data) {
+export function decodePayload(data) {
 	let prefix = protocols[data[0]];
 	if (!prefix) {
 		// 36 to 255 should be ""
@@ -54,7 +56,7 @@ function decode(data) {
 
 // shorten a URI with standard prefix
 // @returns an array of bytes
-function encode(uri) {
+export function encodePayload(uri) {
 	let prefix;
 	let protocolCode;
 	let encoded;
@@ -79,8 +81,3 @@ function encode(uri) {
 
 	return encoded;
 }
-
-module.exports = {
-	encodePayload: encode,
-	decodePayload: decode,
-};

@@ -3,6 +3,7 @@
   "version": "0.2.0",
   "description": "Library to create and parse NDEF messages.",
   "main": "src/index.js",
+  "type": "module",
   "scripts": {
     "test": "node --test",
     "ci": "biome ci ./src",

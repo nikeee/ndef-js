@@ -1,3 +1,5 @@
+// @ts-check
+
 // ndef-util.js
 // Copyright 2013 Don Coleman
 //
@@ -5,7 +7,7 @@
 // This is from phonegap-nfc.js and is a combination of helpers in nfc and util
 // https://github.com/chariotsolutions/phonegap-nfc/blob/master/www/phonegap-nfc.js
 
-function stringToBytes(string) {
+export function stringToBytes(string) {
 	const bytes = Buffer(string).toJSON();
 	if (bytes.hasOwnProperty("data")) {
 		// Node 0.12.x
@@ -15,12 +17,12 @@ function stringToBytes(string) {
 	return bytes;
 }
 
-function bytesToString(bytes) {
+export function bytesToString(bytes) {
 	return Buffer(bytes).toString();
 }
 
 // useful for readable version of Tag UID
-function bytesToHexString(bytes) {
+export function bytesToHexString(bytes) {
 	let dec;
 	let hexstring;
 	let bytesAsHexString = "";
@@ -41,7 +43,7 @@ function bytesToHexString(bytes) {
 }
 
 // i must be <= 256
-function toHex(i) {
+export function toHex(i) {
 	let hex;
 
 	if (i < 0) {
@@ -56,17 +58,9 @@ function toHex(i) {
 	return hex;
 }
 
-function toPrintable(i) {
+export function toPrintable(i) {
 	if ((i >= 0x20) & (i <= 0x7f)) {
 		return String.fromCharCode(i);
 	}
 	return ".";
 }
-
-module.exports = {
-	stringToBytes: stringToBytes,
-	bytesToString: bytesToString,
-	bytesToHexString: bytesToHexString,
-	toHex: toHex,
-	toPrintable: toPrintable,
-};

@@ -1,3 +1,5 @@
+// @ts-check
+
 // mifare_classic.js
 // Copyright 2013 Don Coleman
 
@@ -44,7 +46,7 @@ function isTrailingBlock(blockNumber) {
 	return (blockNumber + 1) % 16 === 0;
 }
 
-function getNdefData(rawTagData) {
+export function getNdefData(rawTagData) {
 	const messageLength = getNdefLength(rawTagData);
 	const buffer = new Buffer(rawTagData.length); // could be messageLength + BLOCK_SIZE * 4
 	let sourceStart = 0;
@@ -84,7 +86,3 @@ function getNdefData(rawTagData) {
 
 	return buffer.slice(messageStart, messageEnd);
 }
-
-module.exports = {
-	getNdefData: getNdefData,
-};

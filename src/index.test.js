@@ -1,7 +1,9 @@
-const assert = require("node:assert");
-const { describe, it } = require("node:test");
+// @ts-check
 
-const ndef = require("./index");
+import assert from "node:assert";
+import { describe, it } from "node:test";
+
+import ndef from "./index.js";
 
 const textMessageHelloWorld = [
 	209, 1, 15, 84, 2, 101, 110, 104, 101, 108, 108, 111, 44, 32, 119, 111, 114,

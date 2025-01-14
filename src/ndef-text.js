@@ -1,8 +1,10 @@
-const util = require("./ndef-util");
+// @ts-check
+
+import * as util from "./ndef-util.js";
 
 // decode text bytes from ndef record payload
 // @returns a string
-function decode(data) {
+export function decodePayload(data) {
 	const languageCodeLength = data[0] & 0x3f; // 6 LSBs
 	const languageCode = data.slice(1, 1 + languageCodeLength);
 	const utf16 = (data[0] & 0x80) !== 0; // assuming UTF-16BE
@@ -15,7 +17,7 @@ function decode(data) {
 
 // encode text payload
 // @returns an array of bytes
-function encode(text, lang, encoding) {
+export function encodePayload(text, lang, encoding) {
 	// ISO/IANA language code, but we're not enforcing
 	if (!lang) {
 		lang = "en";
@@ -26,8 +28,3 @@ function encode(text, lang, encoding) {
 
 	return encoded;
 }
-
-module.exports = {
-	encodePayload: encode,
-	decodePayload: decode,
-};

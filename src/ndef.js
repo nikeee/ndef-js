@@ -1,11 +1,13 @@
+// @ts-check
+
 // ndef.js
 // Copyright 2013 Don Coleman
 //
 // This code is from phonegap-nfc.js https://github.com/don/phonegap-nfc
 
-const util = require("./ndef-util");
-const textHelper = require("./ndef-text");
-const uriHelper = require("./ndef-uri");
+import * as util from "./ndef-util.js";
+import * as textHelper from "./ndef-text.js";
+import * as uriHelper from "./ndef-uri.js";
 
 const ndef = {
 	// see android.nfc.NdefRecord for documentation about constants
@@ -459,7 +461,7 @@ const stringifier = {
 		if (!separator) {
 			separator = "\n";
 		}
-		result = "";
+		let result = "";
 
 		// Print out the payload for each record
 		message.forEach((record) => {
@@ -556,7 +558,7 @@ const stringifier = {
 
 // convert bytes to a String
 function s(bytes) {
-	return new Buffer(bytes).toString();
+	return Buffer.from(bytes).toString();
 }
 
 // expose helper objects
@@ -566,4 +568,4 @@ ndef.tnfToString = tnfToString;
 ndef.util = util;
 ndef.stringify = stringifier.stringify;
 
-module.exports = ndef;
+export default ndef;
