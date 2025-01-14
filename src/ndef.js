@@ -32,10 +32,10 @@ const ndef = {
 	/**
 	 * Creates a JSON representation of a NDEF Record.
 	 *
-	 * @tnf 3-bit TNF (Type Name Format) - use one of the TNF_* constants
-	 * @type byte array, containing zero to 255 bytes, must not be null
-	 * @id byte array, containing zero to 255 bytes, must not be null
-	 * @payload byte array, containing zero to (2 ** 32 - 1) bytes, must not be null
+	 * @param {number} tnf 3-bit TNF (Type Name Format) - use one of the TNF_* constants
+	 * @param {number[]} type byte array, containing zero to 255 bytes, must not be null
+	 * @param {number[]} id byte array, containing zero to 255 bytes, must not be null
+	 * @param {number[]} payload byte array, containing zero to (2 ** 32 - 1) bytes, must not be null
 	 *
 	 * @returns JSON representation of a NDEF record
 	 *
@@ -186,13 +186,14 @@ const ndef = {
 	/**
 	 * Encodes an NDEF Message into bytes that can be written to a NFC tag.
 	 *
-	 * @param {object[]} ndefRecords an Array of NDEF Records
+	 * @param {any[]} ndefRecords an Array of NDEF Records
 	 *
 	 * @returns {number[]} byte array
 	 *
 	 * @see NFC Data Exchange Format (NDEF) http://www.nfc-forum.org/specs/spec_list/
 	 */
 	encodeMessage: (ndefRecords) => {
+		/** @type {any[]} */
 		let encoded = [];
 		let tnf_byte;
 		let record_type;
@@ -378,36 +379,31 @@ const ndef = {
 	},
 };
 
+/**
+ * @param {number} tnf
+ * @returns {string}
+ */
 function tnfToString(tnf) {
-	let value = tnf;
-
 	switch (tnf) {
 		case ndef.TNF_EMPTY:
-			value = "Empty";
-			break;
+			return "Empty";
 		case ndef.TNF_WELL_KNOWN:
-			value = "Well Known";
-			break;
+			return "Well Known";
 		case ndef.TNF_MIME_MEDIA:
-			value = "Mime Media";
-			break;
+			return "Mime Media";
 		case ndef.TNF_ABSOLUTE_URI:
-			value = "Absolute URI";
-			break;
+			return "Absolute URI";
 		case ndef.TNF_EXTERNAL_TYPE:
-			value = "External";
-			break;
+			return "External";
 		case ndef.TNF_UNKNOWN:
-			value = "Unknown";
-			break;
+			return "Unknown";
 		case ndef.TNF_UNCHANGED:
-			value = "Unchanged";
-			break;
+			return "Unchanged";
 		case ndef.TNF_RESERVED:
-			value = "Reserved";
-			break;
+			return "Reserved";
+		default:
+			throw new Error(`Can't process TNF ${tnf}`);
 	}
-	return value;
 }
 
 // Convert NDEF records and messages to strings

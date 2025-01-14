@@ -51,7 +51,6 @@ export function getNdefData(rawTagData) {
 	const buffer = new Buffer(rawTagData.length); // could be messageLength + BLOCK_SIZE * 4
 	let sourceStart = 0;
 	let targetStart = 0;
-	let messageStart;
 	let messageEnd;
 	let i;
 
@@ -74,7 +73,7 @@ export function getNdefData(rawTagData) {
 	}
 
 	// message starts in sector 1, but we've removed trailing blocks, so it's now block 4
-	messageStart = BLOCK_SIZE * 3 + TL_LENGTH;
+	const messageStart = BLOCK_SIZE * 3 + TL_LENGTH;
 	messageEnd = messageStart + messageLength;
 
 	// verify NDEF TLV end
