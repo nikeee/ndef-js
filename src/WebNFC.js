@@ -71,7 +71,9 @@
  */
 export function createNdefMessage(message) {
 	const res = createNdefMessageInner(message, "", 0);
-	// TODO: Check created records
+	if (!checkCreatedRecords(res.records, "")) {
+		throw new TypeError("The created record is invalid");
+	}
 	return res;
 }
 
@@ -126,6 +128,16 @@ function createNdefMessageInner(source, context, recordsDepth) {
 	}
 
 	throw new TypeError("Unable to process the given message");
+}
+
+/**
+ * Implements https://w3c.github.io/web-nfc/#check-created-records
+ * @param {readonly NDEFRecord[]} records
+ * @param {string} context
+ * @returns {boolean}
+ */
+function checkCreatedRecords(records, context) {
+	return true; // TODO
 }
 
 /**
