@@ -1,13 +1,10 @@
 // @ts-check
 
-// ndef.js
-// Copyright 2013 Don Coleman
-//
-// This code is from phonegap-nfc.js https://github.com/don/phonegap-nfc
+// This code is based on phonegap-nfc.js https://github.com/don/phonegap-nfc
 
 import * as textHelper from "./ndef-text.js";
 import * as uriHelper from "./ndef-uri.js";
-import * as util from "./ndef-util.js";
+import * as util from "./util.js";
 
 /**
  * See [android.nfc.NdefRecord](https://developer.android.com/reference/android/nfc/NdefRecord) for documentation about constants.

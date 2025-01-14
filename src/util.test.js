@@ -3,7 +3,7 @@
 import * as assert from "node:assert";
 import { describe, it } from "node:test";
 
-import * as util from "./ndef-util.js";
+import * as util from "./util.js";
 
 describe("UTF-8", () => {
 	it("should encode UTF-8", () => {

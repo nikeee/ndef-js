@@ -1,10 +1,6 @@
 // @ts-check
 
-// ndef-util.js
-// Copyright 2013 Don Coleman
-//
-
-// This is from phonegap-nfc.js and is a combination of helpers in nfc and util
+// This code is based on:
 // https://github.com/chariotsolutions/phonegap-nfc/blob/master/www/phonegap-nfc.js
 
 /**

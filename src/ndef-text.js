@@ -1,6 +1,6 @@
 // @ts-check
 
-import * as util from "./ndef-util.js";
+import * as util from "./util.js";
 
 /**
  * decode text bytes from ndef record payload

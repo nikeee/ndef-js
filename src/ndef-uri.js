@@ -1,9 +1,11 @@
 // @ts-check
 
-import * as util from "./ndef-util.js";
+import * as util from "./util.js";
 
-// URI identifier codes from URI Record Type Definition NFCForum-TS-RTD.URI_1.0 2006-07-24
-// index in array matches code in the spec
+/**
+ * URI identifier codes from URI Record Type Definition NFCForum-TS-RTD.URI_1.0 2006-07-24
+ * index in array matches code in the spec
+ */
 const protocols = [
 	"",
 	"http://www.",

@@ -4,7 +4,7 @@ import * as assert from "node:assert";
 import { describe, it } from "node:test";
 
 import * as uriHelper from "./ndef-uri.js";
-import * as util from "./ndef-util.js";
+import * as util from "./util.js";
 
 describe("NDEF URI Encoder", () => {
 	it("should encode URIs", () => {
