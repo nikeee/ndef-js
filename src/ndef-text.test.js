@@ -1,4 +1,6 @@
 const assert = require("node:assert");
+const { describe, it } = require("node:test");
+
 const textHelper = require("./ndef-text");
 
 describe("NDEF Text Encoder", () => {

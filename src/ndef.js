@@ -60,12 +60,12 @@ const ndef = {
 		}
 
 		// in the future, id could be a String
-		if (!(Array.isArray(id))) {
+		if (!Array.isArray(id)) {
 			id = util.stringToBytes(id);
 		}
 
 		// Payload must be binary
-		if (!(Array.isArray(payload))) {
+		if (!Array.isArray(payload)) {
 			payload = util.stringToBytes(payload);
 		}
 
@@ -211,12 +211,8 @@ const ndef = {
 	 * http://developer.android.com/guide/topics/connectivity/nfc/nfc.html#aar
 	 *
 	 */
-	androidApplicationRecord: (packageName) => ndef.record(
-			ndef.TNF_EXTERNAL_TYPE,
-			"android.com:pkg",
-			[],
-			packageName,
-		),
+	androidApplicationRecord: (packageName) =>
+		ndef.record(ndef.TNF_EXTERNAL_TYPE, "android.com:pkg", [], packageName),
 
 	/**
 	 * Encodes an NDEF Message into bytes that can be written to a NFC tag.
@@ -304,7 +300,7 @@ const ndef = {
 			);
 		}
 
-		const bytes = bytes.slice(0); // clone since parsing is destructive
+		bytes = bytes.slice(0); // clone since parsing is destructive
 		const ndef_message = [];
 		let tnf_byte;
 		let header;
@@ -356,13 +352,13 @@ const ndef = {
 	 *  See NFC Data Exchange Format (NDEF) Specification Section 3.2 RecordLayout
 	 */
 	decodeTnf: (tnf_byte) => ({
-			mb: (tnf_byte & 0x80) !== 0,
-			me: (tnf_byte & 0x40) !== 0,
-			cf: (tnf_byte & 0x20) !== 0,
-			sr: (tnf_byte & 0x10) !== 0,
-			il: (tnf_byte & 0x8) !== 0,
-			tnf: tnf_byte & 0x7,
-		}),
+		mb: (tnf_byte & 0x80) !== 0,
+		me: (tnf_byte & 0x40) !== 0,
+		cf: (tnf_byte & 0x20) !== 0,
+		sr: (tnf_byte & 0x10) !== 0,
+		il: (tnf_byte & 0x8) !== 0,
+		tnf: tnf_byte & 0x7,
+	}),
 
 	/**
 	 * Encode NDEF bit flags into a TNF Byte.
@@ -453,7 +449,7 @@ const stringifier = {
 
 			return stringifier.printRecords(data, separator);
 		}
-			return stringifier.printRecord(data, separator);
+		return stringifier.printRecord(data, separator);
 	},
 
 	// @message - NDEF Message (array of NDEF Records)

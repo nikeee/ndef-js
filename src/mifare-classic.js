@@ -41,7 +41,7 @@ function isTrailingBlock(blockNumber) {
 	if (blockNumber < 32 * 4) {
 		return (blockNumber + 1) % 4 === 0;
 	}
-		return (blockNumber + 1) % 16 === 0;
+	return (blockNumber + 1) % 16 === 0;
 }
 
 function getNdefData(rawTagData) {

@@ -1,4 +1,6 @@
 const assert = require("node:assert");
+const { describe, it } = require("node:test");
+
 const ndef = require("./index");
 
 const textMessageHelloWorld = [
@@ -77,7 +79,9 @@ describe("Encode Message", () => {
 				0x38, 0x35, 0x33, 0x32, 0x39, 0x7d, 0x00, 0x01, 0x20,
 			];
 
-			const message = [ndef.absoluteUriRecord("windows.com/LaunchApp", payload)];
+			const message = [
+				ndef.absoluteUriRecord("windows.com/LaunchApp", payload),
+			];
 
 			const encoded = ndef.encodeMessage(message);
 

@@ -11,8 +11,8 @@ function stringToBytes(string) {
 		// Node 0.12.x
 		return bytes.data;
 	}
-		// Node 0.10.x
-		return bytes;
+	// Node 0.10.x
+	return bytes;
 }
 
 function bytesToString(bytes) {
@@ -60,7 +60,7 @@ function toPrintable(i) {
 	if ((i >= 0x20) & (i <= 0x7f)) {
 		return String.fromCharCode(i);
 	}
-		return ".";
+	return ".";
 }
 
 module.exports = {

@@ -1,4 +1,6 @@
 const assert = require("node:assert");
+const { describe, it } = require("node:test");
+
 const uriHelper = require("./ndef-uri");
 const util = require("./ndef-util");
 
