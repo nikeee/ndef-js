@@ -402,7 +402,7 @@ function tnfToString(tnf) {
 		case ndef.TNF_RESERVED:
 			return "Reserved";
 		default:
-			throw new Error(`Can't process TNF ${tnf}`);
+			return tnf?.toString();
 	}
 }
 
