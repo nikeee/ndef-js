@@ -29,21 +29,10 @@ export function bytesToString(bytes) {
  * @returns
  */
 export function bytesToHexString(bytes) {
-	let dec;
-	let hexString;
 	let bytesAsHexString = "";
 	for (let i = 0; i < bytes.length; i++) {
-		if (bytes[i] >= 0) {
-			dec = bytes[i];
-		} else {
-			dec = 256 + bytes[i];
-		}
-		hexString = dec.toString(16);
-		// zero padding
-		if (hexString.length === 1) {
-			hexString = `0${hexString}`;
-		}
-		bytesAsHexString += hexString;
+		const dec = bytes[i] >= 0 ? bytes[i] : 256 + bytes[i];
+		bytesAsHexString += toHex(dec);
 	}
 	return bytesAsHexString;
 }
@@ -53,18 +42,9 @@ export function bytesToHexString(bytes) {
  * @returns {string}
  */
 export function toHex(i) {
-	let hex;
-
-	if (i < 0) {
-		i += 256;
-	}
-	hex = i.toString(16);
-
-	// zero padding
-	if (hex.length === 1) {
-		hex = `0${hex}`;
-	}
-	return hex;
+	const iEffective = i < 0 ? 256 + i : i;
+	const hex = iEffective.toString(16);
+	return hex.length === 1 ? `0${hex}` : hex;
 }
 
 /**
@@ -72,8 +52,5 @@ export function toHex(i) {
  * @returns {string}
  */
 export function toPrintable(i) {
-	if (i >= 0x20 && i <= 0x7f) {
-		return String.fromCharCode(i);
-	}
-	return ".";
+	return i >= 0x20 && i <= 0x7f ? String.fromCharCode(i) : ".";
 }
