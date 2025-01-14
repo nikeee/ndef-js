@@ -84,6 +84,72 @@ const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
 
 /**
+ * URI identifier codes from URI Record Type Definition NFCForum-TS-RTD.URI_1.0 2006-07-24
+ * index in array matches code in the spec
+ */
+const urlPrefixes = [
+	"",
+	"http://www.",
+	"https://www.",
+	"http://",
+	"https://",
+	"tel:",
+	"mailto:",
+	"ftp://anonymous:anonymous@",
+	"ftp://ftp.",
+	"ftps://",
+	"sftp://",
+	"smb://",
+	"nfs://",
+	"ftp://",
+	"dav://",
+	"news:",
+	"telnet://",
+	"imap:",
+	"rtsp://",
+	"urn:",
+	"pop:",
+	"sip:",
+	"sips:",
+	"tftp:",
+	"btspp://",
+	"btl2cap://",
+	"btgoep://",
+	"tcpobex://",
+	"irdaobex://",
+	"file://",
+	"urn:epc:id:",
+	"urn:epc:tag:",
+	"urn:epc:pat:",
+	"urn:epc:raw:",
+	"urn:epc:",
+	"urn:nfc:",
+];
+
+/**
+ *
+ * @param {string} value
+ * @param {string[]} prefixes
+ * @returns {[number, string]}
+ */
+function findLongestPrefix(value, prefixes) {
+	if (prefixes.length === 0) {
+		throw new Error("The prefixes array must not be empty");
+	}
+
+	let longestPrefixIndex = 0;
+	let longestPrefixLength = 0;
+	for (let i = 1; i < prefixes.length; ++i) {
+		const p = prefixes[i];
+		if (p.length > longestPrefixLength && value.startsWith(p)) {
+			longestPrefixIndex = i;
+			longestPrefixLength = p.length;
+		}
+	}
+	return [longestPrefixIndex, prefixes[longestPrefixIndex]];
+}
+
+/**
  * @param {NDEFMessageInit | string | BufferSource} message
  * @returns {NDEFMessage}
  */
@@ -250,8 +316,38 @@ function createNdefRecordInner(record, context, recordsDepth) {
 				encoding,
 				mediaType: null,
 				data: new DataView(
-					typeof data === "string" ? textEncoder.encode(data) : data,
+					typeof data === "string" ? textEncoder.encode(data).buffer : data,
 				),
+			};
+		}
+
+		case "url": {
+			if (record.mediaType !== null && record.mediaType !== undefined) {
+				throw new TypeError(
+					"The mediaType attribute must be null for url record",
+				);
+			}
+			const data = record.data;
+			if (!data || typeof data !== "string") {
+				throw new TypeError(
+					"The data attribute must be a string for url record",
+				);
+			}
+
+			const parsedUrl = URL.parse(data);
+			if (parsedUrl === null) {
+				throw new SyntaxError("Invalid URL");
+			}
+
+			const serializedUrl = parsedUrl.toString();
+
+			return {
+				recordType: "url",
+				id: record.id ?? null,
+				lang: null,
+				encoding: null,
+				mediaType: null,
+				data: new DataView(textEncoder.encode(serializedUrl).buffer),
 			};
 		}
 
@@ -349,6 +445,10 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 			header.tnf = TNF.WELL_KNOWN;
 			type = new Uint8Array([0x54]); // "T"
 			break;
+		case "url":
+			header.tnf = TNF.WELL_KNOWN;
+			type = new Uint8Array([0x55]); // "U"
+			break;
 		case "mime":
 			header.tnf = TNF.MIME_MEDIA;
 			type = new Uint8Array(0); // TODO: Serialize mime type: https://mimesniff.spec.whatwg.org/#serialize-a-mime-type
@@ -365,6 +465,7 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 		(header.il ? 0b00001_000 : 0) |
 		header.tnf;
 
+	// TEXT:
 	/*
 		const header = (encoding !== "utf-8" ? 0b1_0_000000 : 0) |
 		(lang.length & 0b0_0_111111);
@@ -373,7 +474,18 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 			...textEncoder.encode(lang),
 			...(typeof data === "string" ? textEncoder.encode(data) : data),
 		];
-		*/
+	*/
+
+	// URL:
+	/*
+		const [prefixNumber, prefix] = findLongestPrefix(
+			serializedUrl,
+			urlPrefixes,
+		);
+
+		const serializedUrlWithoutPrefix =
+			prefix.length > 0 ? serializedUrl.slice(prefix.length) : prefix;
+	*/
 
 	throw new Error("Not implemented");
 }
