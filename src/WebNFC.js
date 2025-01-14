@@ -316,6 +316,7 @@ function createNdefRecordInner(record, context, recordsDepth) {
 				encoding,
 				mediaType: null,
 				data: new DataView(
+					// @ts-ignore
 					typeof data === "string" ? textEncoder.encode(data).buffer : data,
 				),
 			};
@@ -420,6 +421,8 @@ export function encodeNdefMessage(message) {
 	throw new Error("Not implemented");
 }
 
+const emptyBuffer = new Uint8Array(0);
+
 /**
  * @param {NDEFRecord} record
  * @param {number} recordIndex
@@ -442,12 +445,13 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 		tnf: 0,
 	};
 
-	let type = null;
+	/** @type {Uint8Array} */
+	let type = emptyBuffer;
 
 	switch (record.recordType) {
 		case "empty":
 			header.tnf = TNF.EMPTY;
-			type = new Uint8Array(0);
+			type = emptyBuffer;
 			break;
 		case "text":
 			header.tnf = TNF.WELL_KNOWN;
@@ -472,14 +476,7 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 			throw new Error("Unsupported recordType");
 	}
 
-	const headerByte =
-		(header.mb ? 0b10000_000 : 0) |
-		(header.me ? 0b01000_000 : 0) |
-		(header.cf ? 0b00100_000 : 0) |
-		(header.sr ? 0b00010_000 : 0) |
-		(header.il ? 0b00001_000 : 0) |
-		header.tnf;
-
+	const payload = emptyBuffer; // TODO
 	// TEXT:
 	/*
 		const header = (encoding !== "utf-8" ? 0b1_0_000000 : 0) |
@@ -501,6 +498,42 @@ function encodeNdefRecord(record, recordIndex, recordCount) {
 		const serializedUrlWithoutPrefix =
 			prefix.length > 0 ? serializedUrl.slice(prefix.length) : prefix;
 	*/
+
+	header.sr = payload.length <= 255;
+
+	// @ts-ignore
+	const headerByte =
+		(header.mb ? 0b10000_000 : 0) |
+		(header.me ? 0b01000_000 : 0) |
+		(header.cf ? 0b00100_000 : 0) |
+		(header.sr ? 0b00010_000 : 0) |
+		(header.il ? 0b00001_000 : 0) |
+		header.tnf;
+
+	const recordData = [headerByte, type.length];
+
+	if (payload.length <= 255) {
+		recordData.push(payload.length);
+	} else {
+		const uint32 = new Uint32Array(1);
+		uint32[0] = payload.length;
+		recordData.push(...new Uint8Array(uint32.buffer));
+	}
+
+	if (id !== undefined) {
+		recordData.push(id.length);
+	}
+	if (type.length > 0) {
+		recordData.push(...type);
+	}
+	if (id !== undefined) {
+		recordData.push(...textEncoder.encode(id));
+	}
+	if (payload.length > 0) {
+		recordData.push(...payload);
+	}
+
+	const recordBuffer = new Uint8Array(recordData).buffer;
 
 	throw new Error("Not implemented");
 }
